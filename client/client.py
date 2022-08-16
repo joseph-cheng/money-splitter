@@ -61,8 +61,7 @@ class Client:
     def remove_item_from_receipt(self, receipt_id, item_idx):
         msg = bytearray(MessageCode.REMOVE_ITEM_FROM_RECEIPT)
         msg.extend(receipt_id.to_bytes(4, config.endianness))
-        msg.extend(item_idx.to_bytes(4, config.endianness))
-        self.send_message(msg)
+        msg.extend(item_idx.to_bytes(4, config.endianness)) self.send_message(msg)
 
     def add_receipt(self, receipt):
         msg = bytearray(MessageCode.ADD_RECEIPT)
@@ -74,6 +73,11 @@ class Client:
         msg = bytearray(MessageCode.REMOVE_RECEIPT)
         msg.extend(receipt_id.to_bytes(4, config.endianness))
 
+        self.send_message(msg)
+
+    def update_receipt(self, new_receipt):
+        msg = bytearray(MessageCode.UPDATE_RECEIPT)
+        msg.extend(pickle.dumps(new_receipt))
         self.send_message(msg)
 
     def save(self):

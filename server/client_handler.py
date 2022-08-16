@@ -124,6 +124,17 @@ class ClientHandler(threading.Thread):
 
         self.dbm.remove_receipt(receipt_id)
 
+    def handle_update_receipt(self, msg):
+        msg_code = msg[0]
+        if msg_code != MessageCode.UPDATE_RECEIPT:
+            print(f"ERROR: handling incorrect message {msg}")
+            return
+
+        receipt_bytes = msg[1:]
+        receipt = pickle.loads(receipt_bytes)
+
+        self.dbm.update_receipt(receipt)
+
     def handle_save(self, msg):
         msg_code = msg[0]
         if msg_code != MessageCode.SAVE_TO_DISK:
