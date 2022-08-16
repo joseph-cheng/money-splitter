@@ -1,9 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 from client.gui.item import GuiItem
+import receipt
 
 class GuiReceipt(ttk.Frame):
     def __init__(self, container, sharer_names):
+
 
         super().__init__(container)
         self.container = container
@@ -11,6 +13,7 @@ class GuiReceipt(ttk.Frame):
         self.sharer_names = sharer_names
         self.create_widgets()
         self.format_widgets()
+
 
     def format_widgets(self):
         options= {'padx':5, 'pady': 5}
@@ -30,6 +33,10 @@ class GuiReceipt(ttk.Frame):
         self.grid()
 
     def create_widgets(self):
+
+        self.payer_label = ttk.Label(self, text="Paid by")
+
+        self.date_label = ttk.Label(self, text="Date")
 
         self.name_label = ttk.Label(self, text="Item")
 
@@ -88,4 +95,3 @@ class GuiReceipt(ttk.Frame):
     def create_item(self):
         self.items.append(GuiItem(self, len(self.items)+1))
         self.format_widgets()
-

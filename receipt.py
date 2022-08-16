@@ -2,9 +2,10 @@ class Receipt:
 
     ID_CTR = 0
 
+    @staticmethod
     def gen_id():
-        ret = ID_CTR
-        ID_CTR += 1
+        ret = Receipt.ID_CTR
+        Receipt.ID_CTR += 1
         return ret
 
     def __init__(self, items, payer, date, metadata):

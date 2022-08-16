@@ -1,4 +1,3 @@
-from receipt import Receipt
 class Database:
 
     def __init__(self):
@@ -40,8 +39,8 @@ class Database:
 
     def add_receipt(self, receipt):
         if self.check_receipt_exists(receipt.id):
-            print("WARNING: sent receipt with existing receipt ID. changing ID of receipt to add")
-            receipt.id = Receipt.gen_id()
+            print("WARNING: sent receipt with existing receipt ID. Doing nothing")
+            return
         self.receipts[receipt.id] = receipt
 
 

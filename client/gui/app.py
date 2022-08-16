@@ -9,3 +9,4 @@ class App(tk.Tk):
 
 
         receipt = GuiReceipt(self, ["Zixiao", "Joe", "Robbie"])
+
