@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+import config
+
 
 class GuiSharers:
 
@@ -41,11 +43,17 @@ class GuiSharers:
     def get_sharer_values(self):
         ret = []
         if self.checkbuttons_showing:
+            checkbuttons_toggled = 0
             for var in self.checkbutton_vars:
                 if var.get() == "1":
-                    ret.append(1/self.num_sharers)
+                    checkbuttons_toggled += 1
+            for var in self.checkbutton_vars:
+                if var.get() == "1":
+                    ret.append(1/checkbuttons_toggled)
                 else:
                     ret.append(0)
+
+
 
         else:
             total_sum = 0
@@ -65,27 +73,31 @@ class GuiSharers:
                     pass
         return ret
 
+    def set_sharer_entrys(self):
+        total_sharers = 0
+        for sharer_var in self.checkbutton_vars:
+            if sharer_var.get() == "1":
+                total_sharers += 1
+        for ii, (sharer_entry, entry_var) in enumerate(zip(self.sharer_entrys, self.entry_vars)):
+            if self.checkbutton_vars[ii].get() == "1":
+                entry_var.set(1/total_sharers)
+            else:
+                entry_var.set(0)
+
+    def sharer_change_callback(self):
+        self.container.update_cost_labels()
+
 
     def create_widgets(self):
         self.sharer_checkbuttons = []
         self.checkbutton_vars = []
 
-        def set_sharer_entrys():
-            total_sharers = 0
-            for sharer_var in self.checkbutton_vars:
-                if sharer_var.get() == "1":
-                    total_sharers += 1
-            for ii, (sharer_entry, entry_var) in enumerate(zip(self.sharer_entrys, self.entry_vars)):
-                if self.checkbutton_vars[ii].get() == "1":
-                    entry_var.set(1/total_sharers)
-                else:
-                    entry_var.set(0)
 
 
 
         for ii in range(self.num_sharers):
             sharer_var = tk.StringVar()
-            sharer_checkbutton = ttk.Checkbutton(self.container, variable=sharer_var, command=set_sharer_entrys)
+            sharer_checkbutton = ttk.Checkbutton(self.container, variable=sharer_var, command=self.set_sharer_entrys)
             self.sharer_checkbuttons.append(sharer_checkbutton)
             self.checkbutton_vars.append(sharer_var)
 
@@ -94,6 +106,7 @@ class GuiSharers:
 
         for ii in range(self.num_sharers):
             sharer_var = tk.StringVar()
+            sharer_var.trace("w", lambda name, index, mode, sv=sharer_var: self.sharer_change_callback())
             sharer_entry = ttk.Entry(self.container, width=5, textvariable=sharer_var)
             self.sharer_entrys.append(sharer_entry)
             self.entry_vars.append(sharer_var)

@@ -30,15 +30,15 @@ class GuiItem:
         self.name_entry = ttk.Entry(self.parent_receipt, width=15)
 
         self.price_var = tk.StringVar()
-        self.price_var.trace("w", lambda *args: self.parent_receipt.update_cost_labels())
+        self.price_var.trace("w", lambda *_: self.parent_receipt.update_cost_labels())
         self.price_entry = ttk.Entry(self.parent_receipt, width=5, textvariable=self.price_var)
 
         self.quantity_var = tk.StringVar()
-        self.quantity_var.trace("w", lambda *args: self.parent_receipt.update_cost_labels())
+        self.quantity_var.trace("w", lambda *_: self.parent_receipt.update_cost_labels())
         self.quantity_entry= ttk.Entry(self.parent_receipt, width=5, textvariable=self.quantity_var)
 
         self.incomplete = tk.StringVar()
-        self.incomplete_button = ttk.Checkbutton(self.parent_receipt, variable=self.incomplete)
+        self.incomplete_button = ttk.Checkbutton(self.parent_receipt, variable=self.incomplete, command=self.parent_receipt.update_cost_labels)
 
         self.sharers = GuiSharers(self.parent_receipt, 3, self.row)
 
@@ -60,12 +60,13 @@ class GuiItem:
 
     def get_sharer_contributions(self):
         sharer_portions = self.sharers.get_sharer_values()
+        print(sharer_portions)
 
         price = self.price_entry.get()
         quantity = self.quantity_entry.get()
-        incomplete = self.incomplete_button.state()
+        incomplete = 'selected' in self.incomplete_button.state()
 
-        if incomplete == ('selected',):
+        if incomplete:
             return [0 for _ in sharer_portions]
 
         total_item_cost = 0
@@ -79,7 +80,3 @@ class GuiItem:
         sharer_contributions = [total_item_cost * sharer_portion for sharer_portion in sharer_portions]
 
         return sharer_contributions
-
-
-
-

@@ -26,7 +26,6 @@ class GuiReceipt(ttk.Frame):
         self.add_item_button.grid(column=0, row=len(self.items)+2)
         self.cost_label.grid(column=2, row=len(self.items)+2, sticky=tk.W, **options)
         for ii, sharer_cost_label in enumerate(self.sharer_cost_labels):
-            print("here!")
             sharer_cost_label.grid(column=4+ii, row=len(self.items)+2, sticky=tk.W, **options)
         self.grid()
 
@@ -60,11 +59,9 @@ class GuiReceipt(ttk.Frame):
         sharer_total_contributions = [0 for _ in self.sharer_names]
         for item in self.items:
             sharer_contributions = item.get_sharer_contributions()
-            print(sharer_contributions)
             for ii, sharer_contribution in enumerate(sharer_contributions):
                 sharer_total_contributions[ii] += sharer_contributions[ii]
 
-        print(sharer_total_contributions)
         self.cost_label.config(text=str(round(sum(sharer_total_contributions), 2)))
         for ii, sharer_cost_label in enumerate(self.sharer_cost_labels):
             sharer_cost_label.config(text=str(round(sharer_total_contributions[ii], 2)))
@@ -86,10 +83,9 @@ class GuiReceipt(ttk.Frame):
             item.shift_up_row()
         
         self.items.pop(item_idx)
-        
 
 
     def create_item(self):
-        self.add_item_button.grid(column=0, row=len(self.items)+2)
         self.items.append(GuiItem(self, len(self.items)+1))
+        self.format_widgets()
 
