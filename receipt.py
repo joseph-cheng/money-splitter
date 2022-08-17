@@ -8,9 +8,17 @@ class Receipt:
         Receipt.ID_CTR += 1
         return ret
 
-    def __init__(self, items, payer, date, metadata):
-        self.id = Receipt.gen_id()
-        self.items = items
+    def __init__(self, payer, date, metadata=None, from_client=False, client=None):
+        if from_client:
+            if client == None:
+                print("ERROR: attempting to generate receipt on the client without access to the server")
+                self.id = -1
+            else:
+                self.id = client.gen_receipt_id()
+
+        else:
+            self.id = Receipt.gen_id()
+        self.items = []
         self.date = date
         self.payer = payer
         self.metadata = metadata
@@ -20,6 +28,9 @@ class Receipt:
 
     def remove_item(self, idx):
         self.items.pop(idx)
+
+    def clear_items(self):
+        self.items = []
 
     def add_item(self, item, idx=None):
         if idx is None:

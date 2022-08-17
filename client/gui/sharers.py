@@ -7,8 +7,9 @@ class GuiSharers:
 
     WIDTH = 100
 
-    def __init__(self, container, num_sharers, row, start_column=4):
-        self.container = container
+    def __init__(self, container_receipt, container_item, num_sharers, row, start_column):
+        self.container_receipt = container_receipt
+        self.container_item = container_item
         self.num_sharers = num_sharers
         self.row = row
         self.start_column = start_column
@@ -18,6 +19,22 @@ class GuiSharers:
 
         self.create_widgets()
         self.format_widgets()
+
+        self.underlying_sharers = None 
+        self.dirty = True
+
+    def make_dirty(self):
+        self.dirty = True
+        self.container_item.make_dirty()
+        self.container_receipt.make_dirty()
+
+
+    def update_underlying_sharers(self):
+        if not(self.dirty):
+            return
+        self.underlying_sharers = self.get_sharer_values()
+        self.dirty = False
+
 
     def shift_up_row(self):
         self.row = self.row - 1
@@ -74,6 +91,7 @@ class GuiSharers:
         return ret
 
     def set_sharer_entrys(self):
+        self.make_dirty()
         total_sharers = 0
         for sharer_var in self.checkbutton_vars:
             if sharer_var.get() == "1":
@@ -85,7 +103,8 @@ class GuiSharers:
                 entry_var.set(0)
 
     def sharer_change_callback(self):
-        self.container.update_cost_labels()
+        self.make_dirty()
+        self.container_receipt.update_cost_labels()
 
 
     def create_widgets(self):
@@ -97,7 +116,7 @@ class GuiSharers:
 
         for ii in range(self.num_sharers):
             sharer_var = tk.StringVar()
-            sharer_checkbutton = ttk.Checkbutton(self.container, variable=sharer_var, command=self.set_sharer_entrys)
+            sharer_checkbutton = ttk.Checkbutton(self.container_receipt, variable=sharer_var, command=self.set_sharer_entrys)
             self.sharer_checkbuttons.append(sharer_checkbutton)
             self.checkbutton_vars.append(sharer_var)
 
@@ -107,7 +126,7 @@ class GuiSharers:
         for ii in range(self.num_sharers):
             sharer_var = tk.StringVar()
             sharer_var.trace("w", lambda name, index, mode, sv=sharer_var: self.sharer_change_callback())
-            sharer_entry = ttk.Entry(self.container, width=5, textvariable=sharer_var)
+            sharer_entry = ttk.Entry(self.container_receipt, width=5, textvariable=sharer_var)
             self.sharer_entrys.append(sharer_entry)
             self.entry_vars.append(sharer_var)
 

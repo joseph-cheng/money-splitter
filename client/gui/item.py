@@ -1,6 +1,8 @@
 import tkinter as tk
+import util
 from tkinter import ttk
 from client.gui.sharers import GuiSharers
+from receipt import ReceiptItem
 
 class GuiItem:
 
@@ -10,15 +12,41 @@ class GuiItem:
         self.row = row
         self.create_widgets()
         self.format_widgets()
+        self.underlying_item = None
+        self.dirty = True
+
+    def make_dirty(self):
+        self.dirty = True
+        self.parent_receipt.make_dirty()
+
+    def update_underlying_item(self):
+        if not(self.dirty):
+            return
+
+        self.sharers.update_underlying_sharers()
+        if self.underlying_item is None:
+            self.underlying_item = ReceiptItem(self.name_var.get(), self.price_var.get(), self.quantity_var.get(), self.sharers.underlying_sharers)
+        else:
+            self.underlying_item.name = self.name_var.get()
+            self.underlying_item.price = self.price_var.get()
+            self.underlying_item.quantity = self.quantity_var.get()
+            self.underlying_item.sharers = self.sharers.underlying_sharers
+
+        self.dirty = False
+
+    def update_parent_cost_labels(self):
+        self.make_dirty()
+        self.parent_receipt.update_cost_labels()
+
 
     def format_widgets(self):
         options = {'padx': 5, 'pady': 5}
-        self.name_entry.grid(column=0, row=self.row, sticky=tk.W, **options)
-        self.price_entry.grid(column=1, row=self.row, sticky=tk.W, **options)
-        self.quantity_entry.grid(column=2, row=self.row, sticky=tk.W, **options)
-        self.incomplete_button.grid(column=3, row=self.row, **options)
-        self.granular_button.grid(column=10, row=self.row, **options)
-        self.delete_button.grid(column=11, row=self.row, **options)
+        self.name_entry.grid(column=2, row=self.row, sticky=tk.W, **options)
+        self.price_entry.grid(column=3, row=self.row, sticky=tk.W, **options)
+        self.quantity_entry.grid(column=4, row=self.row, sticky=tk.W, **options)
+        self.incomplete_button.grid(column=5, row=self.row, **options)
+        self.granular_button.grid(column=12, row=self.row, **options)
+        self.delete_button.grid(column=13, row=self.row, **options)
 
     def shift_up_row(self):
         self.row = self.row - 1
@@ -27,20 +55,24 @@ class GuiItem:
 
 
     def create_widgets(self):
+        vcmd = (self.parent_receipt.register(util.is_float))
+
+        self.name_var = tk.StringVar()
+        self.name_var.trace("w", lambda *_: self.make_dirty())
         self.name_entry = ttk.Entry(self.parent_receipt, width=15)
 
         self.price_var = tk.StringVar()
-        self.price_var.trace("w", lambda *_: self.parent_receipt.update_cost_labels())
-        self.price_entry = ttk.Entry(self.parent_receipt, width=5, textvariable=self.price_var)
+        self.price_var.trace("w", lambda *_: self.update_parent_cost_labels)
+        self.price_entry = ttk.Entry(self.parent_receipt, width=5, textvariable=self.price_var, validate='all', validatecommand=(vcmd, '%P'))
 
         self.quantity_var = tk.StringVar()
-        self.quantity_var.trace("w", lambda *_: self.parent_receipt.update_cost_labels())
-        self.quantity_entry= ttk.Entry(self.parent_receipt, width=5, textvariable=self.quantity_var)
+        self.quantity_var.trace("w", lambda *_: self.update_parent_cost_labels)
+        self.quantity_entry= ttk.Entry(self.parent_receipt, width=5, textvariable=self.quantity_var, validate='all', validatecommand=(vcmd, '%P'))
 
         self.incomplete = tk.StringVar()
-        self.incomplete_button = ttk.Checkbutton(self.parent_receipt, variable=self.incomplete, command=self.parent_receipt.update_cost_labels)
+        self.incomplete_button = ttk.Checkbutton(self.parent_receipt, variable=self.incomplete, command=self.update_parent_cost_labels)
 
-        self.sharers = GuiSharers(self.parent_receipt, 3, self.row)
+        self.sharers = GuiSharers(self.parent_receipt, self, 3, self.row, 6)
 
         self.granular = tk.StringVar()
         self.granular_button = ttk.Checkbutton(self.parent_receipt, variable=self.granular, command=self.sharers.swap)
