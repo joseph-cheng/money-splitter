@@ -164,6 +164,7 @@ class GuiSharers:
             for ii, sharer in enumerate(sharers):
                 ret.entry_vars[ii].set(str(sharers[sharer]))
 
+        ret.underlying_sharers = sharers
         return ret
 
 

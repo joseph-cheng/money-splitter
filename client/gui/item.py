@@ -121,4 +121,5 @@ class GuiItem:
         ret.price_var.set(str(item.price))
         ret.incomplete_button.state(['selected'])
         ret.sharers = GuiSharers.create_from_data(item.sharers, parent_receipt, ret, row, 6)
+        ret.underlying_item = item
         return ret

@@ -8,6 +8,7 @@ import config
 class Client:
     def __init__(self):
         self.sock = None
+        self.database = None
 
     def init(self, ip, port):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

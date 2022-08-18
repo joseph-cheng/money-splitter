@@ -150,4 +150,5 @@ class GuiReceipt(ttk.Frame):
         ret = GuiReceipt(container, sharer_names, starting_items=len(receipt.items))
         ret.payer_var.set(receipt.payer)
         ret.date_var.set(str(receipt.date))
+        ret.underlying_receipt = receipt
         return ret

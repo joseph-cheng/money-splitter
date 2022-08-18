@@ -62,3 +62,6 @@ class Database:
         else:
             print(f"ERROR: receipt ID {receipt_id} not in database, returning None")
             return None
+
+    def get_all_receipts(self):
+        return list(self.receipts.values())
