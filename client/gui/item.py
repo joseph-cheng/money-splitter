@@ -112,3 +112,13 @@ class GuiItem:
         sharer_contributions = [total_item_cost * sharer_portion for sharer_portion in sharer_portions]
 
         return sharer_contributions
+
+    @staticmethod
+    def create_from_data(item, parent_receipt, row):
+        ret = GuiItem(parent_receipt, row)
+        ret.name_var.set(item.name)
+        ret.quantity_var.set(str(item.quantity))
+        ret.price_var.set(str(item.price))
+        ret.incomplete_button.state(['selected'])
+        ret.sharers = GuiSharers.create_from_data(item.sharers, parent_receipt, ret, row, 6)
+        return ret

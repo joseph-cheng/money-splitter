@@ -44,14 +44,15 @@ class Receipt:
 
 class ReceiptItem:
 
-    def __init__(self, name, price, quantity, sharers):
+    def __init__(self, name, price, quantity, sharers, incomplete=False):
         self.name = name
         self.price = price
         self.quantity = quantity
         self.sharers = sharers
+        self.incomplete = incomplete
 
     def get_total_price(self):
-        return self.price * self.quantity
+        return 0 if self.incomplete else self.price * self.quantity
 
     def get_price_for_sharer(self, sharer):
         return self.sharers.get(sharer, 0) * self.get_total_price()

@@ -149,3 +149,23 @@ class GuiSharers:
         for sharer_entry in self.sharer_entrys:
             sharer_entry.grid_forget()
 
+    @staticmethod
+    def create_from_data(sharers, parent_receipt, parent_container, row, start_column):
+        ret = GuiSharers(parent_receipt, parent_container, len(sharers), row, start_column)
+        unique_sharer_values = set(sharers.values())
+        # if this is true, then we should use checkbuttons
+        if 0 in unique_sharer_values and len(unique_sharer_values) == 2:
+            for ii, sharer in enumerate(sharers):
+                if sharers[sharer] != 0:
+                    ret.checkbutton_vars[ii].set("1")
+        # otherwise, use the entry fields
+        else:
+            ret.swap()
+            for ii, sharer in enumerate(sharers):
+                ret.entry_vars[ii].set(str(sharers[sharer]))
+
+        return ret
+
+
+
+

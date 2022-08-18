@@ -74,8 +74,12 @@ class GuiReceipt(ttk.Frame):
 
         self.date_label = ttk.Label(self, text="Date")
 
-        self.payer_entry = ttk.Entry(self, width=10)
-        self.date_entry = ttk.Entry(self, width=10)
+        
+        self.payer_var = tk.StringVar()
+        self.payer_entry = ttk.Entry(self, width=10, textvariable=self.payer_var)
+
+        self.date_var = tk.StringVar()
+        self.date_entry = ttk.Entry(self, width=10, textvariable=self.date_var)
 
 
         self.name_label = ttk.Label(self, text="Item")
@@ -136,3 +140,14 @@ class GuiReceipt(ttk.Frame):
     def create_item(self):
         self.items.append(GuiItem(self, len(self.items)+1))
         self.format_widgets()
+
+    @staticmethod
+    def create_from_data(receipt, container):
+        if len(receipt.items) == 0:
+            sharer_names = ["Zixiao", "Joe", "Robbie"]
+        else:
+            sharer_names = list(receipt.items[0].sharers.keys())
+        ret = GuiReceipt(container, sharer_names, starting_items=len(receipt.items))
+        ret.payer_var.set(receipt.payer)
+        ret.date_var.set(str(receipt.date))
+        return ret
