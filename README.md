@@ -14,7 +14,7 @@ $ source venv/bin/activate
 Then, be sure to install the required packages:
 
 ```
-$ pip -r requirements.txt
+$ python3 -m pip install -r requirements.txt
 ```
 
 In order to run the server, run the following command:
