@@ -8,11 +8,19 @@ class Receipt:
         Receipt.ID_CTR += 1
         return ret
 
+    @staticmethod
+    def str_to_id(id):
+        try:
+            return int(id)
+        except:
+            print(f"ERROR: given id {id} cannot be converted, returning None")
+            return None
+
     def __init__(self, payer, date, metadata=None, from_client=False, client=None):
         if from_client:
             if client == None:
                 print("ERROR: attempting to generate receipt on the client without access to the server")
-                self.id = -1
+                self.id = -Receipt.gen_id()
             else:
                 self.id = client.gen_receipt_id()
 

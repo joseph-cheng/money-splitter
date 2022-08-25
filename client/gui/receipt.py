@@ -1,4 +1,5 @@
 import tkinter as tk
+import config
 from tkinter import ttk
 from client.gui.item import GuiItem
 from receipt import Receipt
@@ -15,7 +16,7 @@ class GuiReceipt(ttk.Frame):
         self.format_widgets()
 
         self.underlying_receipt = None
-        self.dirty = True
+        self.make_dirty()
 
         for ii in range(starting_items):
             self.create_item()
@@ -29,8 +30,8 @@ class GuiReceipt(ttk.Frame):
             return
         if self.underlying_receipt == None:
             self.underlying_receipt = Receipt(
-                    self.payer_entry.get(),
-                    self.date_entry.get(),
+                    self.payer_var.get(),
+                    self.date_var.get(),
                     from_client=True,
                     client=self.container.get_client()
                     )
@@ -42,9 +43,14 @@ class GuiReceipt(ttk.Frame):
             for item in self.items:
                 item.update_underlying_item()
                 self.underlying_receipt.add_item(item.underlying_item)
-                self.underlying_receipt.payer = self.payer_entry.get()
-                self.underlying_receipt.date = self.date_entry.get()
+                self.underlying_receipt.payer = self.payer_var.get()
+                self.underlying_receipt.date = self.date_var.get()
         self.dirty = False
+
+    def get_underlying_receipt(self):
+        if self.underlying_receipt is None:
+            print("WARNING: returning non-existent underlying receipt as None")
+        return self.underlying_receipt
 
 
     def format_widgets(self):
@@ -80,6 +86,9 @@ class GuiReceipt(ttk.Frame):
 
         self.date_var = tk.StringVar()
         self.date_entry = ttk.Entry(self, width=10, textvariable=self.date_var)
+
+        self.payer_var.trace("w", lambda *_: self.make_dirty())
+        self.date_var.trace("w", lambda *_: self.make_dirty())
 
 
         self.name_label = ttk.Label(self, text="Item")
@@ -144,7 +153,7 @@ class GuiReceipt(ttk.Frame):
     @staticmethod
     def create_from_data(receipt, container):
         if len(receipt.items) == 0:
-            sharer_names = ["Zixiao", "Joe", "Robbie"]
+            sharer_names = config.default_sharer_names
         else:
             sharer_names = list(receipt.items[0].sharers.keys())
         ret = GuiReceipt(container, sharer_names, starting_items=len(receipt.items))
