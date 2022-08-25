@@ -7,7 +7,7 @@ class GuiSharers:
 
     WIDTH = 100
 
-    def __init__(self, container_receipt, container_item, num_sharers, row, start_column, sharer_names):
+    def __init__(self, container_receipt, container_item, num_sharers, row, start_column, sharer_names, underlying_sharers=None):
         self.container_receipt = container_receipt
         self.container_item = container_item
         self.num_sharers = num_sharers
@@ -21,14 +21,23 @@ class GuiSharers:
         self.create_widgets()
         self.format_widgets()
 
-        self.underlying_sharers = None 
-        self.dirty = True
+        self.underlying_sharers = underlying_sharers 
+        if self.underlying_sharers is None:
+            self.trace_variables()
+            self.make_dirty()
+        else:
+            self.dirty = False
 
     def make_dirty(self):
         self.dirty = True
         self.container_item.make_dirty()
         self.container_receipt.make_dirty()
 
+
+    def get_underlying_sharers(self):
+        if self.dirty:
+            self.update_underlying_sharers()
+        return self.underlying_sharers
 
     def update_underlying_sharers(self):
         if not(self.dirty):
@@ -83,7 +92,9 @@ class GuiSharers:
                     print(f"WARNING: sharer value '{var.get()}' cannot be converted to float, ignoring")
                     pass
 
-            if total_sum - 1 >= config.EPSILON:
+            if total_sum == 0:
+                total_sum = 1
+            if abs(total_sum - 1) >= config.EPSILON:
                 print("WARNING: sharers do not sum to 1, implicitly normalising")
             for var in self.entry_vars:
                 try:
@@ -113,9 +124,6 @@ class GuiSharers:
         self.sharer_checkbuttons = []
         self.checkbutton_vars = []
 
-
-
-
         for ii in range(self.num_sharers):
             sharer_var = tk.StringVar()
             sharer_checkbutton = ttk.Checkbutton(self.container_receipt, variable=sharer_var, command=self.set_sharer_entrys)
@@ -127,15 +135,21 @@ class GuiSharers:
 
         for ii in range(self.num_sharers):
             sharer_var = tk.StringVar()
-            sharer_var.trace("w", lambda name, index, mode, sv=sharer_var: self.sharer_change_callback())
             sharer_entry = ttk.Entry(self.container_receipt, width=5, textvariable=sharer_var)
             self.sharer_entrys.append(sharer_entry)
             self.entry_vars.append(sharer_var)
 
+        self.granular = tk.StringVar()
+        self.granular_button = ttk.Checkbutton(self.container_receipt, variable=self.granular, command=self.swap)
         self.swap()
+
+    def trace_variables(self):
+        for entry_var in self.entry_vars:
+            entry_var.trace("w", lambda *_: self.sharer_change_callback())
 
 
     def format_widgets(self):
+        options = {'padx': 5, 'pady': 5}
         if self.checkbuttons_showing:
             for ii, sharer_checkbutton in enumerate(self.sharer_checkbuttons):
                 sharer_checkbutton.grid(column=self.start_column + ii, row=self.row, padx=20)
@@ -143,6 +157,7 @@ class GuiSharers:
         else:
             for ii, sharer_entry in enumerate(self.sharer_entrys):
                 sharer_entry.grid(column=self.start_column + ii, row=self.row)
+        self.granular_button.grid(column=12, row=self.row, **options)
 
     def delete(self):
         for sharer_checkbutton in self.sharer_checkbuttons:
@@ -151,12 +166,14 @@ class GuiSharers:
         for sharer_entry in self.sharer_entrys:
             sharer_entry.grid_forget()
 
+        self.granular_button.grid_forget()
+
     @staticmethod
     def create_from_data(sharers, parent_receipt, parent_container, row, start_column):
-        ret = GuiSharers(parent_receipt, parent_container, len(sharers), row, start_column, parent_receipt.sharer_names)
+        ret = GuiSharers(parent_receipt, parent_container, len(sharers), row, start_column, parent_receipt.sharer_names, underlying_sharers=sharers)
         unique_sharer_values = set(sharers.values())
         # if this is true, then we should use checkbuttons
-        if 0 in unique_sharer_values and len(unique_sharer_values) == 2:
+        if 0 in unique_sharer_values and len(unique_sharer_values) == 2 or len(unique_sharer_values) == 1:
             for ii, sharer in enumerate(sharers):
                 if sharers[sharer] != 0:
                     ret.checkbutton_vars[ii].set("1")
@@ -166,7 +183,7 @@ class GuiSharers:
             for ii, sharer in enumerate(sharers):
                 ret.entry_vars[ii].set(str(sharers[sharer]))
 
-        ret.underlying_sharers = sharers
+        ret.trace_variables()
         return ret
 
 

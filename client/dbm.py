@@ -22,6 +22,9 @@ class DBM:
     def get_all_receipts(self):
         return self.database.get_all_receipts()
 
+    def get_receipt_by_id(self, receipt_id):
+        return self.database.get_receipt_by_id(receipt_id)
+
 
     
 

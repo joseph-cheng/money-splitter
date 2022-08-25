@@ -114,11 +114,11 @@ class Client:
 
     def upload_changes(self):
         for receipt_id in self.dbm.new_receipt_ids:
-            self.add_receipt(self.database.get_receipt_by_id(receipt_id))
+            self.add_receipt(self.dbm.get_receipt_by_id(receipt_id))
 
 
         for receipt_id in self.dbm.changed_receipt_ids:
-            self.update_receipt(self.database.get_receipt_by_id(receipt_id))
+            self.update_receipt(self.dbm.get_receipt_by_id(receipt_id))
 
 
         for receipt_id in self.dbm.removed_receipt_ids:

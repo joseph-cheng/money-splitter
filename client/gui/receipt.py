@@ -5,25 +5,33 @@ from client.gui.item import GuiItem
 from receipt import Receipt
 
 class GuiReceipt(ttk.Frame):
-    def __init__(self, container, sharer_names, starting_items=5):
+    def __init__(self, container, sharer_names, starting_items=5, underlying_receipt=None):
 
 
         super().__init__(container)
         self.container = container
         self.items = []
         self.sharer_names = sharer_names
+        self.underlying_receipt = underlying_receipt
         self.create_widgets()
         self.format_widgets()
 
-        self.underlying_receipt = None
-        self.make_dirty()
+        
+        if self.underlying_receipt is None:
+            self.make_dirty()
+            self.trace_variables()
+        else:
+            self.dirty = False
 
         for ii in range(starting_items):
             self.create_item()
 
 
     def make_dirty(self):
+
         self.dirty = True
+        if self.underlying_receipt is not None:
+            self.container.acknowledge_changed_receipt(self.underlying_receipt.id)
 
     def update_underlying_receipt(self):
         if not(self.dirty):
@@ -36,13 +44,13 @@ class GuiReceipt(ttk.Frame):
                     client=self.container.get_client()
                     )
             for item in self.items:
-                item.update_underlying_item()
-                self.underlying_receipt.add_item(item.underlying_item)
+                underlying_item = item.get_underlying_item()
+                self.underlying_receipt.add_item(underlying_item)
         else:
             self.underlying_receipt.clear_items()
             for item in self.items:
-                item.update_underlying_item()
-                self.underlying_receipt.add_item(item.underlying_item)
+                underlying_item = item.get_underlying_item()
+                self.underlying_receipt.add_item(underlying_item)
                 self.underlying_receipt.payer = self.payer_var.get()
                 self.underlying_receipt.date = self.date_var.get()
         self.dirty = False
@@ -89,8 +97,6 @@ class GuiReceipt(ttk.Frame):
         self.date_var = tk.StringVar()
         self.date_entry = ttk.Entry(self, width=10, textvariable=self.date_var)
 
-        self.payer_var.trace("w", lambda *_: self.make_dirty())
-        self.date_var.trace("w", lambda *_: self.make_dirty())
 
 
         self.name_label = ttk.Label(self, text="Item")
@@ -118,7 +124,6 @@ class GuiReceipt(ttk.Frame):
             self.sharer_cost_labels.append(ttk.Label(self, text="0.00"))
 
     def update_cost_labels(self):
-        self.make_dirty()
         sharer_total_contributions = [0 for _ in self.sharer_names]
         for item in self.items:
             sharer_contributions = item.get_sharer_contributions()
@@ -152,14 +157,23 @@ class GuiReceipt(ttk.Frame):
         self.items.append(GuiItem(self, len(self.items)+1))
         self.format_widgets()
 
+    def trace_variables(self):
+        self.payer_var.trace("w", lambda *_: self.make_dirty())
+        self.date_var.trace("w", lambda *_: self.make_dirty())
+
     @staticmethod
     def create_from_data(receipt, container):
         if len(receipt.items) == 0:
             sharer_names = config.default_sharer_names
         else:
             sharer_names = list(receipt.items[0].sharers.keys())
-        ret = GuiReceipt(container, sharer_names, starting_items=len(receipt.items))
-        ret.payer_var.set(receipt.payer)
+        ret = GuiReceipt(container, sharer_names, starting_items=0, underlying_receipt=receipt)
+        for ii, item in enumerate(receipt.items):
+            ret.items.append(GuiItem.create_from_data(item, ret, ii+1))
+
         ret.date_var.set(str(receipt.date))
-        ret.underlying_receipt = receipt
+        ret.payer_var.set(receipt.payer)
+        ret.trace_variables()
+        ret.format_widgets()
+        ret.update_cost_labels()
         return ret

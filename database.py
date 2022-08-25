@@ -4,7 +4,7 @@ class Database:
         self.receipts = {}
 
     def get_max_receipt_id(self):
-        return max(self.receipts.keys())
+        return max(self.receipts.keys(), default=-1)
 
     def change_item_in_receipt(self, receipt_id, item_idx, new_item):
         receipt_to_change = self.get_receipt_by_id(receipt_id)
