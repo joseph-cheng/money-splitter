@@ -10,8 +10,7 @@ class App(tk.Tk):
         self.title("Money Splitter v0.1")
 
 
-        receipt_editor = GuiReceiptEditor(self, self.client.database)
-        #receipt = GuiReceipt(self, ["Zixiao", "Joe", "Robbie"])
+        receipt_editor = GuiReceiptEditor(self, self.client)
 
     def get_client(self):
         return self.client

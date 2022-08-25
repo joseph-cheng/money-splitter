@@ -48,6 +48,8 @@ class GuiReceipt(ttk.Frame):
         self.dirty = False
 
     def get_underlying_receipt(self):
+        if self.dirty:
+            self.update_underlying_receipt()
         if self.underlying_receipt is None:
             print("WARNING: returning non-existent underlying receipt as None")
         return self.underlying_receipt

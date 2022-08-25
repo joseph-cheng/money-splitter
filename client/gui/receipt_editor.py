@@ -5,17 +5,25 @@ from receipt import Receipt
 import config
 
 class GuiReceiptEditor(ttk.Frame):
-    def __init__(self, container, database):
+    def __init__(self, container, client):
         super().__init__(container)
         self.container = container
-        self.database = database
+        self.client = client
+        self.database = client.database
+
+        self.new_receipt_ids = set()
+        self.changed_receipt_ids = set()
+        self.removed_receipt_ids = set()
 
         self.create_widgets()
         self.format_widgets()
 
+    def acknowledge_changed_receipt(self, receipt_id):
+        if receipt_id not in self.new_receipt_ids:
+            self.changed_receipt_ids.add(receipt_id)
+
     def get_client(self):
-        # TODO
-        return None
+        return self.client
 
     def format_widgets(self):
         self.receipt_selector.grid()
@@ -72,6 +80,20 @@ class GuiReceiptEditor(ttk.Frame):
         self.choose_receipt(new_receipt.underlying_receipt.id)
 
         self.update_option_menu()
+        self.new_receipt_ids.add(new_receipt.underlying_receipt.id)
+
+    def update_database(self):
+        for receipt_id in self.new_receipt_ids:
+            gui_receipt = self.gui_receipts[receipt_id]
+            receipt = gui_receipt.get_underlying_receipt()
+            self.database.add_receipt(receipt)
+        for receipt_id in self.changed_receipt_ids:
+            gui_receipt = self.gui_receipts[receipt_id]
+            receipt = gui_receipt.get_underlying_receipt()
+            self.database.update_receipt(receipt)
+
+        for receipt_id in self.removed_receipt_ids:
+            self.database.remove_receipt(receipt_id)
 
 
     def update_option_menu(self):

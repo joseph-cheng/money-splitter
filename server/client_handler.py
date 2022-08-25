@@ -23,39 +23,51 @@ class ClientHandler(threading.Thread):
         next_message_len = 9e99
         while True:
             received_data.extend(self.sock.recv(4096))
+            print("INFO: received data:")
 
             if len(received_data) >= 4:
                 next_message_len = int.from_bytes(received_data[:4], config.endianness)
 
             if len(received_data) >= 4 + next_message_len:
                 message_to_process = received_data[4:4 + next_message_len]
-                process_message(self, msg)
+                self.process_message(message_to_process)
                 received_data = received_data[4+next_message_len:]
         print("INFO: client exited...")
 
     def process_message(self, msg):
-        if msg[0] == CHANGE_ITEM_IN_RECEIPT:
+        print(msg[0])
+        print(MessageCode.GEN_RECEIPT_ID.value)
+        if msg[0] == MessageCode.CHANGE_ITEM_IN_RECEIPT.to_int():
             self.handle_change_item_in_receipt(msg)
             
-        elif msg[0] == ADD_ITEM_TO_RECEIPT:
+        elif msg[0] == MessageCode.ADD_ITEM_TO_RECEIPT.to_int():
             self.handle_add_item_to_receipt(msg)
 
-        elif msg[0] == REMOVE_ITEM_FROM_RECEIPT:
+        elif msg[0] == MessageCode.REMOVE_ITEM_FROM_RECEIPT.to_int():
             self.handle_remove_item_from_receipt(msg)
 
-        elif msg[0] == ADD_RECEIPT:
+        elif msg[0] == MessageCode.ADD_RECEIPT.to_int():
             self.handle_add_receipt(msg)
 
-        elif msg[0] == REMOVE_RECEIPT:
+        elif msg[0] == MessageCode.REMOVE_RECEIPT.to_int():
             self.handle_remove_receipt(msg)
 
-        elif msg[0] == SAVE_TO_DISK:
+        elif msg[0] == MessageCode.SAVE_TO_DISK.to_int():
             self.handle_save(msg)
+
+        elif msg[0] == MessageCode.GEN_RECEIPT_ID.to_int():
+            self.handle_gen_receipt_id(msg)
+
+        elif msg[0] == MessageCode.UPDATE_RECEIPT.to_int():
+            self.handle_update_receipt(msg)
+        else:
+            print(f"ERROR: received message with no correponding message code: {msg}")
 
 
     def handle_change_item_in_receipt(self, msg):
+        print("INFO: handling change item in receipt message...")
         msg_code = msg[0]
-        if msg_code != MessageCode.CHANGE_ITEM_IN_RECEIPT:
+        if msg_code != MessageCode.CHANGE_ITEM_IN_RECEIPT.to_int():
             print(f"ERROR: handling incorrect message {msg}")
             return
 
@@ -74,8 +86,9 @@ class ClientHandler(threading.Thread):
         self.dbm.change_item_in_receipt(receipt_id, item_idx, item)
 
     def handle_add_item_to_receipt(self, msg):
+        print("INFO: handling add item to receipt message...")
         msg_code = msg[0]
-        if msg_code != MessageCode.ADD_ITEM_TO_RECEIPT:
+        if msg_code != MessageCode.ADD_ITEM_TO_RECEIPT.to_int():
             print(f"ERROR: handling incorrect message {msg}")
             return
 
@@ -88,8 +101,9 @@ class ClientHandler(threading.Thread):
         self.dbm.add_item_to_receipt(self, receipt_id, item)
 
     def handle_remove_item_from_receipt(self, msg):
+        print("INFO: handling remove item from receipt message...")
         msg_code = msg[0]
-        if msg_code != MessageCode.REMOVE_ITEM_FROM_RECEIPT:
+        if msg_code != MessageCode.REMOVE_ITEM_FROM_RECEIPT.to_int():
             print(f"ERROR: handling incorrect message {msg}")
             return
 
@@ -102,8 +116,9 @@ class ClientHandler(threading.Thread):
         self.dbm.remove_item_from_receipt(receipt_id, item_idx)
 
     def handle_add_receipt(self, msg):
+        print("INFO: handling add receipt message...")
         msg_code = msg[0]
-        if msg_code  != MessageCode.ADD_RECEIPT:
+        if msg_code  != MessageCode.ADD_RECEIPT.to_int():
             print(f"ERROR: handling incorrect message {msg}")
             return
 
@@ -113,8 +128,9 @@ class ClientHandler(threading.Thread):
         self.dbm.add_receipt(receipt)
 
     def handle_remove_receipt(self, msg):
+        print("INFO: handling remove receipt message...")
         msg_code = msg[0]
-        if msg_code != MessageCode.REMOVE_RECEIPT:
+        if msg_code != MessageCode.REMOVE_RECEIPT.to_int():
             print(f"ERROR: handling incorrect message {msg}")
             return
 
@@ -125,8 +141,9 @@ class ClientHandler(threading.Thread):
         self.dbm.remove_receipt(receipt_id)
 
     def handle_update_receipt(self, msg):
+        print("INFO: handling update receipt message...")
         msg_code = msg[0]
-        if msg_code != MessageCode.UPDATE_RECEIPT:
+        if msg_code != MessageCode.UPDATE_RECEIPT.to_int():
             print(f"ERROR: handling incorrect message {msg}")
             return
 
@@ -136,16 +153,18 @@ class ClientHandler(threading.Thread):
         self.dbm.update_receipt(receipt)
 
     def handle_save(self, msg):
+        print("INFO: handling save message...")
         msg_code = msg[0]
-        if msg_code != MessageCode.SAVE_TO_DISK:
+        if msg_code != MessageCode.SAVE_TO_DISK.to_int():
             print(f"ERROR: handling incorrect message {msg}")
             return
 
         self.dbm.save()
 
     def handle_gen_receipt_id(self, msg):
+        print("INFO: handling gen receipt id message...")
         msg_code = msg[0]
-        if msg_code != MessageCode.GEN_RECEIPT_ID:
+        if msg_code != MessageCode.GEN_RECEIPT_ID.to_int():
             print(f"ERROR: handling incorrect message {msg}")
             return
 

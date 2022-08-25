@@ -23,6 +23,10 @@ class Receipt:
                 self.id = -Receipt.gen_id()
             else:
                 self.id = client.gen_receipt_id()
+                # if this happens, client is not initialised
+                if self.id is None:
+                    self.id = -Receipt.gen_id()
+
 
         else:
             self.id = Receipt.gen_id()
