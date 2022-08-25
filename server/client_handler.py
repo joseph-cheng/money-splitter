@@ -3,6 +3,7 @@ import config
 import pickle
 from client.message_codes import MessageCode
 import threading
+from server.multiqueue import MultiQueue
 
 class ClientHandler(threading.Thread):
 
@@ -19,24 +20,26 @@ class ClientHandler(threading.Thread):
         serialised_db_size_bytes = (len(serialised_db)).to_bytes(4, config.endianness)
         self.sock.sendall(serialised_db_size_bytes)
         self.sock.sendall(serialised_db)
-        received_data = bytearray()
-        next_message_len = 9e99
+        data_queue = MultiQueue()
+        data_receiver = DataReceiver(data_queue, self.sock)
+        data_receiver.start()
         while True:
-            received_data.extend(self.sock.recv(4096))
-            print("INFO: received data:")
+            # every message is prefixed with 4 bytes of the message length
+            message_len_bytes = data_queue.read(4)
+            # if the client quits, exit
+            if data_queue.is_finished():
+                break
+            next_message_len = int.from_bytes(message_len_bytes, config.endianness)
 
-            if len(received_data) >= 4:
-                next_message_len = int.from_bytes(received_data[:4], config.endianness)
+            message_bytes = data_queue.read(next_message_len)
+            # if the client quits, exit
+            if data_queue.is_finished():
+                break
+            self.process_message(message_bytes)
 
-            if len(received_data) >= 4 + next_message_len:
-                message_to_process = received_data[4:4 + next_message_len]
-                self.process_message(message_to_process)
-                received_data = received_data[4+next_message_len:]
         print("INFO: client exited...")
 
     def process_message(self, msg):
-        print(msg[0])
-        print(MessageCode.GEN_RECEIPT_ID.value)
         if msg[0] == MessageCode.CHANGE_ITEM_IN_RECEIPT.to_int():
             self.handle_change_item_in_receipt(msg)
             
@@ -174,3 +177,18 @@ class ClientHandler(threading.Thread):
         self.sock.send(rid_bytes)
 
 
+class DataReceiver(threading.Thread):
+    def __init__(self, mq, sock):
+        threading.Thread.__init__(self)
+        self.mq = mq
+        self.sock = sock
+
+    def run(self):
+        while True:
+            data = self.sock.recv(4096)
+            if len(data) == 0:
+                print("INFO: Client closed connection, stopping data receiver")
+                break
+            self.mq.extend(data)
+
+    

@@ -72,7 +72,7 @@ class GuiItem:
         self.incomplete = tk.StringVar()
         self.incomplete_button = ttk.Checkbutton(self.parent_receipt, variable=self.incomplete, command=self.update_parent_cost_labels)
 
-        self.sharers = GuiSharers(self.parent_receipt, self, 3, self.row, 6)
+        self.sharers = GuiSharers(self.parent_receipt, self, 3, self.row, 6, self.parent_receipt.sharer_names)
 
         self.granular = tk.StringVar()
         self.granular_button = ttk.Checkbutton(self.parent_receipt, variable=self.granular, command=self.sharers.swap)

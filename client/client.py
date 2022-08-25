@@ -1,8 +1,6 @@
-import receipt
 import pickle
 from client.message_codes import MessageCode
 import socket
-import database
 import config
 
 class Client:
@@ -17,10 +15,10 @@ class Client:
             return
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((ip, port))
+        self.initialised = True
 
         serialised_db = self.receive_message()
         self.database = pickle.loads(serialised_db)
-        self.initialised = True
 
     def deinit(self):
         if not(self.initialised):
@@ -100,6 +98,7 @@ class Client:
     def save(self):
         msg = bytearray(MessageCode.SAVE_TO_DISK.value)
         self.send_message(msg)
+        print("sent save message...")
 
     def gen_receipt_id(self):
         msg = bytearray(MessageCode.GEN_RECEIPT_ID.value)
@@ -110,3 +109,21 @@ class Client:
         rid = int.from_bytes(rid_bytes, config.endianness)
 
         return rid
+
+    def upload_changes(self):
+        for receipt_id in self.database.new_receipt_ids:
+            self.add_receipt(self.database.get_receipt_by_id(receipt_id))
+
+
+        for receipt_id in self.database.changed_receipt_ids:
+            self.update_receipt(self.database.get_receipt_by_id(receipt_id))
+
+
+        for receipt_id in self.database.removed_receipt_ids:
+            self.remove_receipt(receipt_id)
+
+        self.database.removed_receipt_ids = set()
+        self.database.changed_receipt_ids = set()
+        self.database.new_receipt_ids = set()
+
+        self.save()

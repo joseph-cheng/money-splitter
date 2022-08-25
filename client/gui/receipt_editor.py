@@ -9,7 +9,6 @@ class GuiReceiptEditor(ttk.Frame):
         super().__init__(container)
         self.container = container
         self.client = client
-        self.database = client.database
 
         self.new_receipt_ids = set()
         self.changed_receipt_ids = set()
@@ -26,14 +25,18 @@ class GuiReceiptEditor(ttk.Frame):
         return self.client
 
     def format_widgets(self):
-        self.receipt_selector.grid()
-        self.create_receipt_button.grid()
+        self.receipt_selector.grid(column=0, row=0)
+        self.create_receipt_button.grid(column=0, row=1)
+        self.save_changes_button.grid(column=1, row=3)
+        if self.chosen_receipt_id is not None:
+            chosen_receipt = self.gui_receipts[self.chosen_receipt_id]
+            chosen_receipt.grid(column=0, row=2)
         self.grid()
 
     def create_widgets(self):
         self.gui_receipts = {}
-        if self.database != None:
-            for receipt in self.database.get_all_receipts():
+        if self.client.database != None:
+            for receipt in self.client.database.get_all_receipts():
                 r = GuiReceipt.create_from_data(receipt, self)
                 self.gui_receipts[receipt.id] = r
                 r.grid_forget()
@@ -47,12 +50,13 @@ class GuiReceiptEditor(ttk.Frame):
         self.create_receipt_names()
         self.receipt_selector = ttk.OptionMenu(self,
                 self.receipt_selector_var,
-                default=self.receipt_id_to_option(self.chosen_receipt_id),
+                self.receipt_id_to_option(self.chosen_receipt_id),
                 *self.receipt_names,
                 command=lambda _: self.choose_receipt(),
                 )
 
         self.create_receipt_button = ttk.Button(self, text = "New Receipt", command=self.create_empty_receipt)
+        self.save_changes_button = ttk.Button(self, text="Save Changes", command=self.upload_changes)
 
     def create_receipt_names(self):
         self.receipt_names = [self.receipt_id_to_option(receipt_id) for receipt_id in self.gui_receipts.keys()]
@@ -86,19 +90,23 @@ class GuiReceiptEditor(ttk.Frame):
         for receipt_id in self.new_receipt_ids:
             gui_receipt = self.gui_receipts[receipt_id]
             receipt = gui_receipt.get_underlying_receipt()
-            self.database.add_receipt(receipt)
+            self.client.database.add_receipt(receipt)
+
         for receipt_id in self.changed_receipt_ids:
             gui_receipt = self.gui_receipts[receipt_id]
             receipt = gui_receipt.get_underlying_receipt()
-            self.database.update_receipt(receipt)
+            self.client.database.update_receipt(receipt)
 
         for receipt_id in self.removed_receipt_ids:
-            self.database.remove_receipt(receipt_id)
+            self.client.database.remove_receipt(receipt_id)
+
+        self.new_receipt_ids = set()
+        self.changed_receipt_ids = set()
+        self.removed_receipt_ids = set()
 
 
     def update_option_menu(self):
         self.create_receipt_names()
-        print(self.receipt_names)
         self.receipt_selector.set_menu(self.receipt_id_to_option(self.chosen_receipt_id), *self.receipt_names)
 
 
@@ -106,6 +114,11 @@ class GuiReceiptEditor(ttk.Frame):
         for receipt_id in self.gui_receipts:
             self.gui_receipts[receipt_id].update_underlying_receipt()
         self.update_option_menu()
+
+    def upload_changes(self):
+        self.save_receipts()
+        self.update_database()
+        self.client.upload_changes()
 
 
     def choose_receipt(self, receipt_id=None):

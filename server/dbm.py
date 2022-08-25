@@ -1,3 +1,4 @@
+from receipt import Receipt
 import pickle
 import database
 from threading import Lock
@@ -6,14 +7,21 @@ class DBM:
 
     def __init__(self, dbfilename=None):
         if dbfilename is None:
-            dbfile = open("default.db", "w+")
             self.dbfilename = "default.db"
-            self.database = database.Database()
         else:
-            dbfile = open(dbfilename, "w+")
             self.dbfilename = dbfilename
-            self.database = pickle.load(dbfile)
 
+        dbfile = open(self.dbfilename, "ab+")
+        dbfile.seek(0)
+
+        try:
+            self.database = pickle.load(dbfile)
+        except:
+            print("WARNING: Failed to successfully load database from file, creating fresh")
+            self.database = database.Database()
+
+        max_receipt_id = self.database.get_max_receipt_id()
+        Receipt.ID_CTR = max_receipt_id + 1
         dbfile.close()
 
         self.db_lock = Lock()
@@ -50,7 +58,7 @@ class DBM:
 
     def save(self):
         with self.db_lock:
-            with open(self.dbfilename, "w+") as f:
+            with open(self.dbfilename, "wb+") as f:
                 pickle.dump(self.database, f)
 
     def serialise_db(self):

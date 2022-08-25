@@ -7,12 +7,13 @@ class GuiSharers:
 
     WIDTH = 100
 
-    def __init__(self, container_receipt, container_item, num_sharers, row, start_column):
+    def __init__(self, container_receipt, container_item, num_sharers, row, start_column, sharer_names):
         self.container_receipt = container_receipt
         self.container_item = container_item
         self.num_sharers = num_sharers
         self.row = row
         self.start_column = start_column
+        self.sharer_names = sharer_names
 
         # this gets immediately swapped in self.create_widgets()
         self.checkbuttons_showing = False
@@ -32,7 +33,8 @@ class GuiSharers:
     def update_underlying_sharers(self):
         if not(self.dirty):
             return
-        self.underlying_sharers = self.get_sharer_values()
+        sharer_values = self.get_sharer_values()
+        self.underlying_sharers = {sharer_name: sharer_value for sharer_name, sharer_value in zip(self.sharer_names, sharer_values)}
         self.dirty = False
 
 
@@ -151,7 +153,7 @@ class GuiSharers:
 
     @staticmethod
     def create_from_data(sharers, parent_receipt, parent_container, row, start_column):
-        ret = GuiSharers(parent_receipt, parent_container, len(sharers), row, start_column)
+        ret = GuiSharers(parent_receipt, parent_container, len(sharers), row, start_column, parent_receipt.sharer_names)
         unique_sharer_values = set(sharers.values())
         # if this is true, then we should use checkbuttons
         if 0 in unique_sharer_values and len(unique_sharer_values) == 2:

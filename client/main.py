@@ -3,8 +3,6 @@ from PyQt5.QtWidgets import QApplication, QLabel
 from client.gui.app import App
 
 
-def run_client(client):
-    client.init("localhost", 1337)
 
 
 if __name__ == "__main__":
@@ -17,7 +15,7 @@ if __name__ == "__main__":
     """
 
     client = Client()
+    client.init("localhost", 1337)
     app = App(client)
-    app.after(0, lambda client=client: run_client(client))
     app.mainloop()
     client.deinit()
