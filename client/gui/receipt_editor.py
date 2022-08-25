@@ -35,8 +35,8 @@ class GuiReceiptEditor(ttk.Frame):
 
     def create_widgets(self):
         self.gui_receipts = {}
-        if self.client.database != None:
-            for receipt in self.client.database.get_all_receipts():
+        if self.client.dbm != None:
+            for receipt in self.client.dbm.get_all_receipts():
                 r = GuiReceipt.create_from_data(receipt, self)
                 self.gui_receipts[receipt.id] = r
                 r.grid_forget()
@@ -90,15 +90,15 @@ class GuiReceiptEditor(ttk.Frame):
         for receipt_id in self.new_receipt_ids:
             gui_receipt = self.gui_receipts[receipt_id]
             receipt = gui_receipt.get_underlying_receipt()
-            self.client.database.add_receipt(receipt)
+            self.client.dbm.add_receipt(receipt)
 
         for receipt_id in self.changed_receipt_ids:
             gui_receipt = self.gui_receipts[receipt_id]
             receipt = gui_receipt.get_underlying_receipt()
-            self.client.database.update_receipt(receipt)
+            self.client.dbm.update_receipt(receipt)
 
         for receipt_id in self.removed_receipt_ids:
-            self.client.database.remove_receipt(receipt_id)
+            self.client.dbm.remove_receipt(receipt_id)
 
         self.new_receipt_ids = set()
         self.changed_receipt_ids = set()

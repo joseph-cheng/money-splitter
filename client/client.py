@@ -2,11 +2,12 @@ import pickle
 from client.message_codes import MessageCode
 import socket
 import config
+from client.dbm import DBM
 
 class Client:
     def __init__(self):
         self.sock = None
-        self.database = None
+        self.dbm = None
         self.initialised = False
 
     def init(self, ip, port):
@@ -18,7 +19,8 @@ class Client:
         self.initialised = True
 
         serialised_db = self.receive_message()
-        self.database = pickle.loads(serialised_db)
+        database = pickle.loads(serialised_db)
+        self.dbm = DBM(database, self)
 
     def deinit(self):
         if not(self.initialised):
@@ -111,19 +113,19 @@ class Client:
         return rid
 
     def upload_changes(self):
-        for receipt_id in self.database.new_receipt_ids:
+        for receipt_id in self.dbm.new_receipt_ids:
             self.add_receipt(self.database.get_receipt_by_id(receipt_id))
 
 
-        for receipt_id in self.database.changed_receipt_ids:
+        for receipt_id in self.dbm.changed_receipt_ids:
             self.update_receipt(self.database.get_receipt_by_id(receipt_id))
 
 
-        for receipt_id in self.database.removed_receipt_ids:
+        for receipt_id in self.dbm.removed_receipt_ids:
             self.remove_receipt(receipt_id)
 
-        self.database.removed_receipt_ids = set()
-        self.database.changed_receipt_ids = set()
-        self.database.new_receipt_ids = set()
+        self.dbm.removed_receipt_ids = set()
+        self.dbm.changed_receipt_ids = set()
+        self.dbm.new_receipt_ids = set()
 
         self.save()

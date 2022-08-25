@@ -2,9 +2,6 @@ class Database:
 
     def __init__(self):
         self.receipts = {}
-        self.new_receipt_ids = set()
-        self.changed_receipt_ids = set()
-        self.removed_receipt_ids = set()
 
     def get_max_receipt_id(self):
         return max(self.receipts.keys())
@@ -38,7 +35,6 @@ class Database:
             print("ERROR: updating receipt that does not already exist")
             return
         self.receipts[receipt.id] = receipt
-        self.changed_receipt_ids.add(receipt.id)
 
 
 
@@ -49,7 +45,6 @@ class Database:
             self.update_receipt(receipt)
             return
         self.receipts[receipt.id] = receipt
-        self.new_receipt_ids.add(receipt.id)
 
 
     def remove_receipt(self, receipt_id):
@@ -58,7 +53,6 @@ class Database:
         else:
             print(f"ERROR: attempting to delete nonexistent receipt with ID {receipt_id}")
             return
-        self.removed_receipt_ids.add(receipt_id)
 
 
     def check_receipt_exists(self, receipt_id):
