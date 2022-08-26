@@ -1,16 +1,10 @@
 import tkinter as tk
-from client.gui.receipt import GuiReceipt
-from client.gui.receipt_editor import GuiReceiptEditor
+from client.gui.connect_screen import ConnectScreen
 
 class App(tk.Tk):
-    def __init__(self, client):
+    def __init__(self):
         super().__init__()
-        self.client = client
 
         self.title("Money Splitter v0.1")
 
-
-        receipt_editor = GuiReceiptEditor(self, self.client)
-
-    def get_client(self):
-        return self.client
+        connect_screen = ConnectScreen(self)
