@@ -21,13 +21,21 @@ class ClientHandler(threading.Thread):
         while True:
             password_len_bytes = bytearray()
             while len(password_len_bytes) < 4:
-                password_len_bytes.extend(self.sock.recv(4096))
+                received = self.sock.recv(4096)
+                if len(received) == 0:
+                    return False
+                password_len_bytes.extend(received)
+            print("INFO: received password length")
             if len(password_len_bytes) > 4:
-                print("ERROR: password length sent in over 4 bytes")
-            password_len = int.from_bytes(password_len_bytes, byteorder=config.endianness)
-            password_bytes = bytearray()
+                print("WARNING: password length sent in over 4 bytes")
+            password_len = int.from_bytes(password_len_bytes[:4], byteorder=config.endianness)
+            password_bytes = password_len_bytes[4:]
             while len(password_bytes) < password_len:
-                password_bytes.extend(self.sock.recv(4096))
+                received = self.sock.recv(4096)
+                if len(received) == 0:
+                    return False
+                password_bytes.extend(received)
+            print("INFO: received password")
 
             m = hashlib.sha256()
             m.update(password_bytes)
@@ -44,6 +52,7 @@ class ClientHandler(threading.Thread):
         serialised_db_size_bytes = (len(serialised_db)).to_bytes(4, config.endianness)
         self.sock.sendall(serialised_db_size_bytes)
         self.sock.sendall(serialised_db)
+        return True
 
 
 
@@ -52,7 +61,10 @@ class ClientHandler(threading.Thread):
     def run(self):
         print("INFO: thread started to handle client...")
 
-        self.do_setup()
+        success = self.do_setup()
+        if not(success):
+            print("INFO: client disconnected during authorisation")
+            return
 
 
 

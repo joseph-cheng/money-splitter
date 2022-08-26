@@ -17,7 +17,7 @@ class PasswordScreen(ttk.Frame):
         self.password_var = tk.StringVar()
         self.password_entry = ttk.Entry(self, width=20, textvariable=self.password_var)
 
-        self.enter_button = ttk.Button(self, text="Enter", command=self.send_password)
+        self.enter_button = ttk.Button(self, text="Enter Password", command=self.send_password)
 
     def format_widgets(self):
         self.password_entry.grid(column=0, row=0)
