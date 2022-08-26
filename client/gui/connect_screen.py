@@ -20,7 +20,7 @@ class ConnectScreen(ttk.Frame):
 
     def create_widgets(self):
         self.ip_var = tk.StringVar()
-        self.ip_entry = ttk.Entry(self, width=10, textvariable=self.ip_var)
+        self.ip_entry = ttk.Entry(self, width=20, textvariable=self.ip_var)
 
         self.port_var = tk.StringVar()
         self.port_entry = ttk.Entry(self, width=5, textvariable=self.port_var)
