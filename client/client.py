@@ -14,6 +14,7 @@ class Client:
         if self.initialised:
             print("WARNING: trying to initialise already initialised socket")
             return
+        print(f"INFO: attempting to connect to {ip}:{port}")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((ip, port))
         self.initialised = True
