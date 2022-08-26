@@ -86,6 +86,8 @@ class GuiItem:
 
         self.delete_button = ttk.Button(self.parent_receipt, text="X", command=self.delete)
 
+        self.name_entry.focus_set()
+
     def delete(self):
         self.parent_receipt.remove_item(self)
         self.name_entry.grid_forget()
@@ -134,5 +136,7 @@ class GuiItem:
             ret.incomplete_button.state(['selected'])
 
         ret.sharers = GuiSharers.create_from_data(item.sharers, parent_receipt, ret, row, 6)
+        # stupid tab-select hack
+        ret.delete_button.tkraise()
         ret.trace_variables()
         return ret

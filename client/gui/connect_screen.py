@@ -30,6 +30,10 @@ class ConnectScreen(ttk.Frame):
 
         self.connect_button = ttk.Button(self, text="Connect", command=self.connect)
 
+        self.ip_entry.bind("<Return>", lambda _: self.connect())
+        self.port_entry.bind("<Return>", lambda _: self.connect())
+        self.ip_entry.focus_set()
+
     def connect(self):
         ip = self.ip_var.get()
         try:

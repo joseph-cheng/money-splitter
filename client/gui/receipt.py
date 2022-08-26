@@ -123,6 +123,8 @@ class GuiReceipt(ttk.Frame):
         for sharer in self.sharer_names:
             self.sharer_cost_labels.append(ttk.Label(self, text="0.00"))
 
+        self.payer_entry.focus_set()
+
     def update_cost_labels(self):
         sharer_total_contributions = [0 for _ in self.sharer_names]
         for item in self.items:
@@ -156,6 +158,7 @@ class GuiReceipt(ttk.Frame):
     def create_item(self):
         self.items.append(GuiItem(self, len(self.items)+1))
         self.format_widgets()
+        self.add_item_button.tkraise()
 
     def trace_variables(self):
         self.payer_var.trace("w", lambda *_: self.make_dirty())
@@ -176,4 +179,5 @@ class GuiReceipt(ttk.Frame):
         ret.trace_variables()
         ret.format_widgets()
         ret.update_cost_labels()
+        ret.add_item_button.tkraise()
         return ret

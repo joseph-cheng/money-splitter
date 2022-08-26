@@ -58,12 +58,10 @@ class GuiSharers:
                 checkbutton.grid_forget()
             for ii, entry in enumerate(self.sharer_entrys):
                 entry.grid(column=self.start_column + ii, row=self.row)
-                entry.tkraise()
 
         else:
             for ii, checkbutton in enumerate(self.sharer_checkbuttons):
                 checkbutton.grid(column=self.start_column + ii, row=self.row, padx=20)
-                checkbutton.tkraise()
             for entry in self.sharer_entrys:
                 entry.grid_forget()
         self.checkbuttons_showing = not(self.checkbuttons_showing)
@@ -124,6 +122,9 @@ class GuiSharers:
         self.sharer_checkbuttons = []
         self.checkbutton_vars = []
 
+        self.granular = tk.StringVar()
+        self.granular_button = ttk.Checkbutton(self.container_receipt, variable=self.granular, command=self.swap)
+
         for ii in range(self.num_sharers):
             sharer_var = tk.StringVar()
             sharer_checkbutton = ttk.Checkbutton(self.container_receipt, variable=sharer_var, command=self.set_sharer_entrys)
@@ -139,8 +140,7 @@ class GuiSharers:
             self.sharer_entrys.append(sharer_entry)
             self.entry_vars.append(sharer_var)
 
-        self.granular = tk.StringVar()
-        self.granular_button = ttk.Checkbutton(self.container_receipt, variable=self.granular, command=self.swap)
+        self.granular_button.tkraise()
         self.swap()
 
     def trace_variables(self):
