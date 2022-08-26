@@ -4,22 +4,60 @@ import pickle
 from client.message_codes import MessageCode
 import threading
 from server.multiqueue import MultiQueue
+import hashlib
 
 class ClientHandler(threading.Thread):
+
+    PASSWORD_HASH = b"hJp\xad\x94}\xe8r\xf5\x950\xbf\xc7\xbe:f7\x03\x85\xe0\xe8=\xc9\x03:\x0e\xc7\x06j\xe2'\x13"
 
     def __init__(self, sock, dbm):
         threading.Thread.__init__(self)
         self.sock = sock
         self.dbm = dbm
 
-    def run(self):
-        print("INFO: thread started to handle client...")
-        print("INFO: sending database to client...")
-        # first send client our database for them to update to
+    def do_setup(self):
+        print("INFO: authorising user...")
+        # first need to authenticate user...
+        while True:
+            password_len_bytes = bytearray()
+            while len(password_len_bytes) < 4:
+                password_len_bytes.extend(self.sock.recv(4096))
+            if len(password_len_bytes) > 4:
+                print("ERROR: password length sent in over 4 bytes")
+            password_len = int.from_bytes(password_len_bytes, byteorder=config.endianness)
+            password_bytes = bytearray()
+            while len(password_bytes) < password_len:
+                password_bytes.extend(self.sock.recv(4096))
+
+            m = hashlib.sha256()
+            m.update(password_bytes)
+            guess_hash = m.digest()
+            if guess_hash == ClientHandler.PASSWORD_HASH:
+                self.sock.sendall(b"\x01")
+                break
+            else:
+                self.sock.sendall(b"\x00")
+                print("INFO: failed to authoriser user...")
+
+        print("INFO: successfully authorised, sending database")
         serialised_db = self.dbm.serialise_db()
         serialised_db_size_bytes = (len(serialised_db)).to_bytes(4, config.endianness)
         self.sock.sendall(serialised_db_size_bytes)
         self.sock.sendall(serialised_db)
+
+
+
+
+
+    def run(self):
+        print("INFO: thread started to handle client...")
+
+        self.do_setup()
+
+
+
+
+        # first send client our database for them to update to
         data_queue = MultiQueue()
         data_receiver = DataReceiver(data_queue, self.sock)
         data_receiver.start()

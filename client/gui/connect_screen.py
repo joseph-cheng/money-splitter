@@ -2,7 +2,7 @@ import tkinter as tk
 import config
 from tkinter import ttk
 from client.client import Client
-from client.gui.receipt_editor import GuiReceiptEditor
+from client.gui.password_screen import PasswordScreen
 
 class ConnectScreen(ttk.Frame):
     def __init__(self, container):
@@ -41,7 +41,8 @@ class ConnectScreen(ttk.Frame):
         client = Client()
         client.init(ip, port)
 
-        receipt_editor = GuiReceiptEditor(self.container, client)
+        password_screen = PasswordScreen(self.container, client)
+
         self.grid_forget()
 
 

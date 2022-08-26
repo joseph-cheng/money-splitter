@@ -19,6 +19,7 @@ class Client:
         self.sock.connect((ip, port))
         self.initialised = True
 
+    def download_db(self):
         serialised_db = self.receive_message()
         database = pickle.loads(serialised_db)
         self.dbm = DBM(database, self)
