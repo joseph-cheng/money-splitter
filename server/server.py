@@ -20,7 +20,7 @@ class Server:
 
         while True:
             conn, addr = self.serversock.accept()
-            logging.info("Connection accepted from {addr}")
+            logging.info(f"Connection accepted from {addr}")
             ch = ClientHandler(conn, self.dbm)
             ch.start()
 
