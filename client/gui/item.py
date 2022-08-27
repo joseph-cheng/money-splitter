@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 import util
 from tkinter import ttk
@@ -117,7 +118,7 @@ class GuiItem:
         try:
             total_item_cost = float(price) * float(quantity)
         except:
-            print(f"ERROR: unable to calculate total cost of item with price {price} and quantity {quantity}")
+            logging.warning(f"Unable to calculate total cost of item with price {price} and quantity {quantity}")
 
 
 
@@ -131,7 +132,6 @@ class GuiItem:
         ret.name_var.set(item.name)
         ret.quantity_var.set(str(item.quantity))
         ret.price_var.set(str(item.price))
-        print(item.incomplete)
         if item.incomplete:
             ret.incomplete.set("1")
 

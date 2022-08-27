@@ -5,6 +5,6 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.title("Money Splitter v0.1")
+        self.title("Money Splitter v0.9")
 
         connect_screen = ConnectScreen(self)

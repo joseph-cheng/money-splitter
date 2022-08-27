@@ -1,3 +1,4 @@
+import logging
 from server.client_handler import ClientHandler
 import socket
 
@@ -14,12 +15,12 @@ class Server:
         self.serversock.bind((ip, port))
 
     def listen(self):
-        print("INFO: listening for connections...")
+        logging.info("Listening for connections...")
         self.serversock.listen(5)
 
         while True:
             conn, addr = self.serversock.accept()
-            print(f"INFO: connection accepted from {addr}")
+            logging.info("Connection accepted from {addr}")
             ch = ClientHandler(conn, self.dbm)
             ch.start()
 

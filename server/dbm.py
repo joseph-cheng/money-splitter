@@ -1,3 +1,4 @@
+import logging
 from receipt import Receipt
 import pickle
 import database
@@ -18,7 +19,7 @@ class DBM:
         try:
             self.database = pickle.load(dbfile)
         except:
-            print("WARNING: Failed to successfully load database from file, creating fresh")
+            logging.warning("Failed to successfully load database from file, creating fresh")
             self.database = database.Database()
 
         max_receipt_id = self.database.get_max_receipt_id()

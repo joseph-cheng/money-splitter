@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 import config
 from tkinter import ttk
@@ -39,7 +40,7 @@ class ConnectScreen(ttk.Frame):
         try:
             port = int(self.port_var.get())
         except:
-            print("ERROR: port is not a number, not connecting")
+            logging.error("Port is not a number, not connecting")
             return
 
         client = Client()

@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 import config
 from tkinter import ttk
@@ -59,7 +60,7 @@ class GuiReceipt(ttk.Frame):
         if self.dirty:
             self.update_underlying_receipt()
         if self.underlying_receipt is None:
-            print("WARNING: returning non-existent underlying receipt as None")
+            logging.warning("Returning non-existent underlying receipt as None")
         return self.underlying_receipt
 
 
@@ -146,7 +147,7 @@ class GuiReceipt(ttk.Frame):
                 break
 
         if item_idx == -1:
-            print("WARNING: Unable to find item to remove from receipt")
+            logging.warning("Unable to find item to remove from receipt")
             return
 
         for item in self.items[item_idx+1:]:

@@ -1,4 +1,5 @@
 from receipt import Receipt
+import logging
 import config
 import pickle
 from client.message_codes import MessageCode
@@ -16,7 +17,7 @@ class ClientHandler(threading.Thread):
         self.dbm = dbm
 
     def do_setup(self):
-        print("INFO: authorising user...")
+        logging.info("Authorising user...")
         # first need to authenticate user...
         while True:
             password_len_bytes = bytearray()
@@ -25,9 +26,9 @@ class ClientHandler(threading.Thread):
                 if len(received) == 0:
                     return False
                 password_len_bytes.extend(received)
-            print("INFO: received password length")
+            logging.info("Received password length")
             if len(password_len_bytes) > 4:
-                print("WARNING: password length sent in over 4 bytes")
+                logging.warning("Password length sent in over 4 bytes")
             password_len = int.from_bytes(password_len_bytes[:4], byteorder=config.endianness)
             password_bytes = password_len_bytes[4:]
             while len(password_bytes) < password_len:
@@ -35,7 +36,7 @@ class ClientHandler(threading.Thread):
                 if len(received) == 0:
                     return False
                 password_bytes.extend(received)
-            print("INFO: received password")
+            logging.info("Received password")
 
             m = hashlib.sha256()
             m.update(password_bytes)
@@ -45,9 +46,9 @@ class ClientHandler(threading.Thread):
                 break
             else:
                 self.sock.sendall(b"\x00")
-                print("INFO: failed to authoriser user...")
+                logging.info("Failed to authorise user...")
 
-        print("INFO: successfully authorised, sending database")
+        logging.info("Successfully authorised, sending database")
         serialised_db = self.dbm.serialise_db()
         serialised_db_size_bytes = (len(serialised_db)).to_bytes(4, config.endianness)
         self.sock.sendall(serialised_db_size_bytes)
@@ -59,11 +60,11 @@ class ClientHandler(threading.Thread):
 
 
     def run(self):
-        print("INFO: thread started to handle client...")
+        logging.info("Thread started to handle client...")
 
         success = self.do_setup()
         if not(success):
-            print("INFO: client disconnected during authorisation")
+            logging.info("Client disconnected during authorisation")
             return
 
 
@@ -87,7 +88,7 @@ class ClientHandler(threading.Thread):
                 break
             self.process_message(message_bytes)
 
-        print("INFO: client exited...")
+        logging.info("Client exited...")
 
     def process_message(self, msg):
         if msg[0] == MessageCode.CHANGE_ITEM_IN_RECEIPT.to_int():
@@ -114,14 +115,14 @@ class ClientHandler(threading.Thread):
         elif msg[0] == MessageCode.UPDATE_RECEIPT.to_int():
             self.handle_update_receipt(msg)
         else:
-            print(f"ERROR: received message with no correponding message code: {msg}")
+            logging.error(f"Received message with no correponding message code: {msg}")
 
 
     def handle_change_item_in_receipt(self, msg):
-        print("INFO: handling change item in receipt message...")
+        logging.info("Handling change item in receipt message...")
         msg_code = msg[0]
         if msg_code != MessageCode.CHANGE_ITEM_IN_RECEIPT.to_int():
-            print(f"ERROR: handling incorrect message {msg}")
+            logging.error(f"Handling incorrect message {msg}")
             return
 
 
@@ -139,10 +140,10 @@ class ClientHandler(threading.Thread):
         self.dbm.change_item_in_receipt(receipt_id, item_idx, item)
 
     def handle_add_item_to_receipt(self, msg):
-        print("INFO: handling add item to receipt message...")
+        logging.info("Handling add item to receipt message...")
         msg_code = msg[0]
         if msg_code != MessageCode.ADD_ITEM_TO_RECEIPT.to_int():
-            print(f"ERROR: handling incorrect message {msg}")
+            logging.error(f"Handling incorrect message {msg}")
             return
 
         receipt_id_bytes = msg[1:1+4]
@@ -154,10 +155,10 @@ class ClientHandler(threading.Thread):
         self.dbm.add_item_to_receipt(self, receipt_id, item)
 
     def handle_remove_item_from_receipt(self, msg):
-        print("INFO: handling remove item from receipt message...")
+        logging.info("Handling remove item from receipt message...")
         msg_code = msg[0]
         if msg_code != MessageCode.REMOVE_ITEM_FROM_RECEIPT.to_int():
-            print(f"ERROR: handling incorrect message {msg}")
+            logging.error(f"Handling incorrect message {msg}")
             return
 
         receipt_id_bytes = msg[1:1+4]
@@ -169,10 +170,10 @@ class ClientHandler(threading.Thread):
         self.dbm.remove_item_from_receipt(receipt_id, item_idx)
 
     def handle_add_receipt(self, msg):
-        print("INFO: handling add receipt message...")
+        logging.info("Handling add receipt message...")
         msg_code = msg[0]
         if msg_code  != MessageCode.ADD_RECEIPT.to_int():
-            print(f"ERROR: handling incorrect message {msg}")
+            logging.error(f"Handling incorrect message {msg}")
             return
 
         receipt_bytes  = msg[1:]
@@ -181,10 +182,10 @@ class ClientHandler(threading.Thread):
         self.dbm.add_receipt(receipt)
 
     def handle_remove_receipt(self, msg):
-        print("INFO: handling remove receipt message...")
+        logging.info("Handling remove receipt message...")
         msg_code = msg[0]
         if msg_code != MessageCode.REMOVE_RECEIPT.to_int():
-            print(f"ERROR: handling incorrect message {msg}")
+            logging.error(f"Handling incorrect message {msg}")
             return
 
         receipt_id_bytes = msg[1:1+4]
@@ -194,10 +195,10 @@ class ClientHandler(threading.Thread):
         self.dbm.remove_receipt(receipt_id)
 
     def handle_update_receipt(self, msg):
-        print("INFO: handling update receipt message...")
+        logging.info("Handling update receipt message...")
         msg_code = msg[0]
         if msg_code != MessageCode.UPDATE_RECEIPT.to_int():
-            print(f"ERROR: handling incorrect message {msg}")
+            logging.error(f"Handling incorrect message {msg}")
             return
 
         receipt_bytes = msg[1:]
@@ -206,19 +207,19 @@ class ClientHandler(threading.Thread):
         self.dbm.update_receipt(receipt)
 
     def handle_save(self, msg):
-        print("INFO: handling save message...")
+        logging.info("Handling save message...")
         msg_code = msg[0]
         if msg_code != MessageCode.SAVE_TO_DISK.to_int():
-            print(f"ERROR: handling incorrect message {msg}")
+            logging.error(f"Handling incorrect message {msg}")
             return
 
         self.dbm.save()
 
     def handle_gen_receipt_id(self, msg):
-        print("INFO: handling gen receipt id message...")
+        logging.info("Handling gen receipt id message...")
         msg_code = msg[0]
         if msg_code != MessageCode.GEN_RECEIPT_ID.to_int():
-            print(f"ERROR: handling incorrect message {msg}")
+            logging.error(f"Handling incorrect message {msg}")
             return
 
         rid = Receipt.gen_id()
@@ -237,7 +238,7 @@ class DataReceiver(threading.Thread):
         while True:
             data = self.sock.recv(4096)
             if len(data) == 0:
-                print("INFO: Client closed connection, stopping data receiver")
+                logging.info("Client closed connection, stopping data receiver")
                 break
             self.mq.extend(data)
 

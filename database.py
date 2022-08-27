@@ -1,3 +1,5 @@
+import logging
+
 class Database:
 
     def __init__(self):
@@ -9,7 +11,7 @@ class Database:
     def change_item_in_receipt(self, receipt_id, item_idx, new_item):
         receipt_to_change = self.get_receipt_by_id(receipt_id)
         if receipt_to_change is None:
-            print(f"ERROR: attempting to change nonexistent receipt with ID {receipt_id}")
+            logging.error(f"Attempting to change nonexistent receipt with ID {receipt_id}")
             return
         receipt_to_change.update_item(new_item, item_idx)
 
@@ -17,7 +19,7 @@ class Database:
     def add_item_to_receipt(self, receipt_id, new_item, idx=None):
         receipt_to_change = self.get_receipt_by_id(receipt_id)
         if receipt_to_change is None:
-            print(f"ERROR: attempting to change nonexistent receipt with ID {receipt_id}")
+            logging.error(f"Attempting to change nonexistent receipt with ID {receipt_id}")
             return
         receipt_to_change.add_item(new_item, idx=idx)
 
@@ -25,14 +27,14 @@ class Database:
     def remove_item_from_receipt(self, receipt_id, item_idx):
         receipt_to_change = self.get_receipt_by_id(receipt_id)
         if receipt_to_change is None:
-            print(f"ERROR: attempting to change nonexistent receipt with ID {receipt_id}")
+            logging.error(f"Attempting to change nonexistent receipt with ID {receipt_id}")
             return
         receipt_to_change.remove_item(item_idx)
 
 
     def update_receipt(self, receipt):
         if not(self.check_receipt_exists(receipt.id)):
-            print("ERROR: updating receipt that does not already exist")
+            logging.error("Updating receipt that does not already exist")
             return
         self.receipts[receipt.id] = receipt
 
@@ -41,7 +43,7 @@ class Database:
 
     def add_receipt(self, receipt):
         if self.check_receipt_exists(receipt.id):
-            print("WARNING: sent receipt with existing receipt ID. updaing receipt instead")
+            logging.warning("Sent receipt with existing receipt ID. updaing receipt instead")
             self.update_receipt(receipt)
             return
         self.receipts[receipt.id] = receipt
@@ -51,7 +53,7 @@ class Database:
         if self.check_receipt_exists(receipt_id):
             del self.receipts[receipt_id]
         else:
-            print(f"ERROR: attempting to delete nonexistent receipt with ID {receipt_id}")
+            logging.error(f"Attempting to delete nonexistent receipt with ID {receipt_id}")
             return
 
 
@@ -63,7 +65,7 @@ class Database:
         if receipt_id in self.receipts:
             return self.receipts[receipt_id]
         else:
-            print(f"ERROR: receipt ID {receipt_id} not in database, returning None")
+            logging.error(f"Receipt ID {receipt_id} not in database, returning None")
             return None
 
     def get_all_receipts(self):

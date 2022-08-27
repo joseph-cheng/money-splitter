@@ -1,3 +1,5 @@
+import logging
+
 class Receipt:
 
     ID_CTR = 0
@@ -13,13 +15,13 @@ class Receipt:
         try:
             return int(id)
         except:
-            print(f"ERROR: given id {id} cannot be converted, returning None")
+            logging.error(f"Given id {id} cannot be converted, returning None")
             return None
 
     def __init__(self, payer, date, metadata=None, from_client=False, client=None):
         if from_client:
             if client == None:
-                print("ERROR: attempting to generate receipt on the client without access to the server")
+                logging.error("Attempting to generate receipt on the client without access to the server")
                 self.id = -Receipt.gen_id()
             else:
                 self.id = client.gen_receipt_id()

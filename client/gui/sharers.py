@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 from tkinter import ttk
 import config
@@ -87,13 +88,13 @@ class GuiSharers:
                 try:
                     total_sum += float(var.get())
                 except ValueError:
-                    print(f"WARNING: sharer value '{var.get()}' cannot be converted to float, ignoring")
+                    logging.warning(f"Sharer value '{var.get()}' cannot be converted to float, ignoring")
                     pass
 
             if total_sum == 0:
                 total_sum = 1
             if abs(total_sum - 1) >= config.EPSILON:
-                print("WARNING: sharers do not sum to 1, implicitly normalising")
+                logging.warning("Sharers do not sum to 1, implicitly normalising")
             for var in self.entry_vars:
                 try:
                     ret.append(float(var.get()) / total_sum)

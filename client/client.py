@@ -1,3 +1,4 @@
+import logging
 import pickle
 from client.message_codes import MessageCode
 import socket
@@ -12,9 +13,9 @@ class Client:
 
     def init(self, ip, port):
         if self.initialised:
-            print("WARNING: trying to initialise already initialised socket")
+            logging.warning("Trying to initialise already initialised socket")
             return
-        print(f"INFO: attempting to connect to {ip}:{port}")
+        logging.info(f"Attempting to connect to {ip}:{port}")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((ip, port))
         self.initialised = True
@@ -26,18 +27,18 @@ class Client:
 
     def deinit(self):
         if not(self.initialised):
-            print("WARNING: trying to deinitialise non-initialised socket")
+            logging.warning("Trying to deinitialise non-initialised socket")
             return
         self.sock.close()
         self.initialised = False
 
     def receive_message(self, msg_len=None):
         if not(self.initialised):
-            print("ERROR: trying to receive message from non-initialised socket")
+            logging.error("Trying to receive message from non-initialised socket")
             return None
         # receives message of length msg_len, if msg_len is not specified, read 4-byte int specifying length first
         if self.sock is None:
-            print("ERROR: socket not initialised when trying to receive message")
+            logging.error("Socket not initialised when trying to receive message")
             return
 
         if msg_len is None:
@@ -50,11 +51,11 @@ class Client:
 
     def send_message(self, msg):
         if not(self.initialised):
-            print("ERROR: trying to send message to non-initialised socket")
+            logging.error("Trying to send message to non-initialised socket")
             return
 
         if self.sock is None:
-            print("ERROR: socket not initialised when trying to send message")
+            logging.error("Socket not initialised when trying to send message")
             return
 
         msg_len_bytes = (len(msg)).to_bytes(4, config.endianness)
@@ -102,7 +103,6 @@ class Client:
     def save(self):
         msg = bytearray(MessageCode.SAVE_TO_DISK.value)
         self.send_message(msg)
-        print("sent save message...")
 
     def gen_receipt_id(self):
         msg = bytearray(MessageCode.GEN_RECEIPT_ID.value)
