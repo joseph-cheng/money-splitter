@@ -40,6 +40,7 @@ class GuiItem:
             self.underlying_item.price = self.price_var.get()
             self.underlying_item.quantity = self.quantity_var.get()
             self.underlying_item.sharers = underlying_sharers
+            self.underlying_item.incomplete = 'selected' in self.incomplete_button.state()
 
         self.dirty = False
 
@@ -130,6 +131,7 @@ class GuiItem:
         ret.name_var.set(item.name)
         ret.quantity_var.set(str(item.quantity))
         ret.price_var.set(str(item.price))
+        print(item.incomplete)
         if item.incomplete:
             ret.incomplete.set("1")
 

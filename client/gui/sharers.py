@@ -182,6 +182,7 @@ class GuiSharers:
             ret.swap()
             for ii, sharer in enumerate(sharers):
                 ret.entry_vars[ii].set(str(sharers[sharer]))
+            ret.granular.set("1")
 
         ret.trace_variables()
         return ret
