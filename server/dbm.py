@@ -63,7 +63,7 @@ class DBM:
                 pickle.dump(self.database, f)
 
             with open(self.dbfilename + ".json", "w+") as f:
-                json.dump(self.database, f)
+                json.dump(self.serialise_db_to_json(), f)
 
     def serialise_db(self):
         with self.db_lock:
