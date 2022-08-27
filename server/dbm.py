@@ -58,12 +58,11 @@ class DBM:
             self.database.remove_receipt(receipt_id)
 
     def save(self):
-        with self.db_lock:
-            with open(self.dbfilename, "wb+") as f:
-                pickle.dump(self.database, f)
+        with open(self.dbfilename, "wb+") as f:
+            f.write(self.serialise_db())
 
-            with open(self.dbfilename + ".json", "w+") as f:
-                json.dump(self.serialise_db_to_json(), f)
+        with open(self.dbfilename + ".json", "w+") as f:
+            json.dump(self.serialise_db_to_json(), f)
 
     def serialise_db(self):
         with self.db_lock:

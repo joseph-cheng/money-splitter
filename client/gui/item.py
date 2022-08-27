@@ -36,7 +36,6 @@ class GuiItem:
         if self.underlying_item is None:
             self.underlying_item = ReceiptItem(self.name_var.get(), self.price_var.get(), self.quantity_var.get(), underlying_sharers)
         else:
-            print(self.name_var.get())
             self.underlying_item.name = self.name_var.get()
             self.underlying_item.price = self.price_var.get()
             self.underlying_item.quantity = self.quantity_var.get()
@@ -105,7 +104,6 @@ class GuiItem:
 
     def get_sharer_contributions(self):
         sharer_portions = self.sharers.get_sharer_values()
-        print(sharer_portions)
 
         price = self.price_entry.get()
         quantity = self.quantity_entry.get()
