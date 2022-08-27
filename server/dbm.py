@@ -2,6 +2,7 @@ from receipt import Receipt
 import pickle
 import database
 from threading import Lock
+import json
 
 class DBM:
 
@@ -60,6 +61,9 @@ class DBM:
         with self.db_lock:
             with open(self.dbfilename, "wb+") as f:
                 pickle.dump(self.database, f)
+
+            with open(self.dbfilename + ".json", "w+") as f:
+                json.dump(self.database, f)
 
     def serialise_db(self):
         with self.db_lock:
