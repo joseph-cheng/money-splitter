@@ -53,6 +53,16 @@ class Receipt:
     def get_total_price(self):
         return sum((item.get_total_price() for item in self.items))
 
+    def to_json(self):
+        return {
+                "date": self.date,
+                "payer": self.payer,
+                "metadata": self.metadata,
+                "items": [
+                    item.to_json() for item in self.items
+                    ],
+                }
+
 
 class ReceiptItem:
 
@@ -68,5 +78,14 @@ class ReceiptItem:
 
     def get_price_for_sharer(self, sharer):
         return self.sharers.get(sharer, 0) * self.get_total_price()
+
+    def to_json(self):
+        return {
+                "name": self.name,
+                "price": self.price,
+                "quantity": self.quantity,
+                "sharers": self.sharers,
+                "incomplete": self.incomplete,
+                }
 
 

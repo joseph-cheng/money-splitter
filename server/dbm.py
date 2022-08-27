@@ -69,6 +69,10 @@ class DBM:
         with self.db_lock:
             return pickle.dumps(self.database)
 
+    def serialise_db_to_json(self):
+        with self.db_lock:
+            return self.database.to_json()
+
 
 
 

@@ -68,3 +68,7 @@ class Database:
 
     def get_all_receipts(self):
         return list(self.receipts.values())
+
+    def to_json(self):
+        return {rid: self.receipts[rid].to_json() for rid in self.receipts}
+
