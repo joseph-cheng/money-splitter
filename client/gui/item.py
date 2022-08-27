@@ -131,7 +131,7 @@ class GuiItem:
         ret.quantity_var.set(str(item.quantity))
         ret.price_var.set(str(item.price))
         if item.incomplete:
-            ret.incomplete_button.state(['selected'])
+            ret.incomplete.set("1")
 
         ret.sharers = GuiSharers.create_from_data(item.sharers, parent_receipt, ret, row, 6)
         # stupid tab-select hack
