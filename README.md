@@ -18,6 +18,13 @@ $ python3 -m venv venv
 $ source venv/bin/activate
 ```
 
+Or, if on Windows:
+
+```
+$ python3 -m venv venv
+$ .\venv\Scripts\activate
+```
+
 Then, be sure to install the required packages:
 
 ```
