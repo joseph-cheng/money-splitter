@@ -10,6 +10,7 @@ class Client:
         self.sock = None
         self.dbm = None
         self.initialised = False
+        self.byte_buffer = bytearray()
 
     def init(self, ip, port):
         if self.initialised:
@@ -32,7 +33,8 @@ class Client:
         self.sock.close()
         self.initialised = False
 
-    def receive_message(self, msg_len=None):
+
+    def receive_message_known_length(self, msg_len):
         if not(self.initialised):
             logging.error("Trying to receive message from non-initialised socket")
             return None
@@ -41,12 +43,23 @@ class Client:
             logging.error("Socket not initialised when trying to receive message")
             return
 
-        if msg_len is None:
-            msg_len_bytes = self.sock.recv(4)
-            msg_len = int.from_bytes(msg_len_bytes, config.endianness)
 
-        msg_bytes = self.sock.recv(msg_len)
-        return msg_bytes
+        while len(self.byte_buffer) < msg_len:
+            bytes_received = self.sock.recv(4096)
+            logging.info(f"Received {len(bytes_received)} bytes")
+            self.byte_buffer.extend(bytes_received)
+
+        ret = self.byte_buffer[:msg_len]
+        self.byte_buffer = self.byte_buffer[msg_len:]
+        return ret
+
+
+    def receive_message(self, msg_len=None):
+        if msg_len is None:
+            msg_len_bytes = self.receive_message_known_length(4)
+            msg_len = int.from_bytes(msg_len_bytes, byteorder=config.endianness)
+
+        return self.receive_message_known_length(msg_len)
 
 
     def send_message(self, msg):
