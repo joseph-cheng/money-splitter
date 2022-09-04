@@ -21,6 +21,14 @@ class GuiReceiptEditor(ttk.Frame):
         if receipt_id not in self.new_receipt_ids:
             self.changed_receipt_ids.add(receipt_id)
 
+    def remove_receipt(self, rid):
+        self.removed_receipt_ids.add(rid)
+        self.gui_receipts.pop(rid, None)
+        self.chosen_receipt_id = list(self.gui_receipts.keys())[0]
+        self.choose_receipt(self.chosen_receipt_id)
+        self.update_option_menu()
+
+
     def get_client(self):
         return self.client
 

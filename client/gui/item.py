@@ -38,8 +38,8 @@ class GuiItem:
             self.underlying_item = ReceiptItem(self.name_var.get(), self.price_var.get(), self.quantity_var.get(), underlying_sharers)
         else:
             self.underlying_item.name = self.name_var.get()
-            self.underlying_item.price = self.price_var.get()
-            self.underlying_item.quantity = self.quantity_var.get()
+            self.underlying_item.price = float(self.price_var.get())
+            self.underlying_item.quantity = float(self.quantity_var.get())
             self.underlying_item.sharers = underlying_sharers
             self.underlying_item.incomplete = 'selected' in self.incomplete_button.state()
 

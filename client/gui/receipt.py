@@ -83,6 +83,7 @@ class GuiReceipt(ttk.Frame):
         self.cost_label.grid(column=4, row=len(self.items)+2, sticky=tk.W, **options)
         for ii, sharer_cost_label in enumerate(self.sharer_cost_labels):
             sharer_cost_label.grid(column=6+ii, row=len(self.items)+2, sticky=tk.W, **options)
+        self.delete_receipt_button.grid(column=0, row=len(self.items)+3)
         self.grid()
 
     def create_widgets(self):
@@ -124,7 +125,14 @@ class GuiReceipt(ttk.Frame):
         for sharer in self.sharer_names:
             self.sharer_cost_labels.append(ttk.Label(self, text="0.00"))
 
+        self.delete_receipt_button = ttk.Button(self, text="Delete Receipt", command=self.delete)
+
         self.payer_entry.focus_set()
+
+    def delete(self):
+        rid = self.get_underlying_receipt().id
+        self.container.remove_receipt(rid)
+        self.grid_forget()
 
     def update_cost_labels(self):
         sharer_total_contributions = [0 for _ in self.sharer_names]

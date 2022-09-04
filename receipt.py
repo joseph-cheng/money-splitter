@@ -76,7 +76,10 @@ class ReceiptItem:
         self.incomplete = incomplete
 
     def get_total_price(self):
-        return 0 if self.incomplete else self.price * self.quantity
+        try:
+            return 0 if self.incomplete else self.price * self.quantity
+        except TypeError:
+            return 0
 
     def get_price_for_sharer(self, sharer):
         return self.sharers.get(sharer, 0) * self.get_total_price()

@@ -1,7 +1,7 @@
 import tkinter as tk
 import config
 from tkinter import ttk
-from client.gui.receipt_editor import GuiReceiptEditor
+from client.gui.main_screen import MainScreen
 
 class PasswordScreen(ttk.Frame):
     def __init__(self, container, client):
@@ -33,7 +33,7 @@ class PasswordScreen(ttk.Frame):
         okay = int.from_bytes(self.client.receive_message(msg_len=1), byteorder=config.endianness)
         if okay:
             self.client.download_db()
-            receipt_editor = GuiReceiptEditor(self.container, self.client)
+            main_screen = MainScreen(self.container, self.client)
             self.grid_forget()
 
 
