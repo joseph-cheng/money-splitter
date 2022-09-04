@@ -88,6 +88,7 @@ class GuiReceipt(ttk.Frame):
 
     def create_widgets(self):
 
+        self.delete_receipt_button = ttk.Button(self, text="Delete Receipt", command=self.delete)
         self.payer_label = ttk.Label(self, text="Paid by")
 
         self.date_label = ttk.Label(self, text="Date")
@@ -125,7 +126,6 @@ class GuiReceipt(ttk.Frame):
         for sharer in self.sharer_names:
             self.sharer_cost_labels.append(ttk.Label(self, text="0.00"))
 
-        self.delete_receipt_button = ttk.Button(self, text="Delete Receipt", command=self.delete)
 
         self.payer_entry.focus_set()
 
