@@ -126,6 +126,7 @@ class GuiReceiptEditor(ttk.Frame):
     def upload_changes(self):
         self.save_receipts()
         self.update_database()
+        self.container.update_debts()
         self.client.upload_changes()
 
 

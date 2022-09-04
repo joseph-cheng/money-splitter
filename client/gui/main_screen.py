@@ -21,5 +21,7 @@ class MainScreen(ttk.Frame):
         self.debt_screen.grid(column=1, row=0)
         self.grid()
 
+    def update_debts(self):
+        self.debt_screen.update_debts()
 
 
