@@ -96,11 +96,15 @@ class GuiReceiptEditor(ttk.Frame):
 
     def update_database(self):
         for receipt_id in self.new_receipt_ids:
+            if receipt_id in self.removed_receipt_ids:
+                continue
             gui_receipt = self.gui_receipts[receipt_id]
             receipt = gui_receipt.get_underlying_receipt()
             self.client.dbm.add_receipt(receipt)
 
         for receipt_id in self.changed_receipt_ids:
+            if receipt_id in self.removed_receipt_ids:
+                continue
             gui_receipt = self.gui_receipts[receipt_id]
             receipt = gui_receipt.get_underlying_receipt()
             self.client.dbm.update_receipt(receipt)
