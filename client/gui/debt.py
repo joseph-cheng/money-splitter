@@ -60,10 +60,12 @@ class DebtScreen(ttk.Frame):
 
         for ii, label in enumerate(self.sharer_debt_labels):
             debt = float(label["text"])
+            options = {"width": 5, "anchor": "center"}
             if debt < 0:
-                label.config(background="red")
+                options["background"] = "red"
             else:
-                label.config(background="green")
+                options["background"] = "green"
+            label.config(**options)
             label.grid(row=ii, column=1)
         self.grid()
 
