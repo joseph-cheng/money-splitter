@@ -55,18 +55,19 @@ class DebtScreen(ttk.Frame):
 
 
     def format_widgets(self):
+        options = {'padx': 5, 'pady': 5}
         for ii, label in enumerate(self.sharer_name_labels):
-            label.grid(row=ii, column=0)
+            label.grid(row=ii, column=0, **options)
 
         for ii, label in enumerate(self.sharer_debt_labels):
             debt = float(label["text"])
-            options = {"width": 5, "anchor": "center"}
+            config = {"width": 5, "anchor": "center"}
             if debt < 0:
-                options["background"] = "red"
+                config["background"] = "red"
             else:
-                options["background"] = "green"
-            label.config(**options)
-            label.grid(row=ii, column=1)
+                config["background"] = "green"
+            label.config(**config)
+            label.grid(row=ii, column=1, **options)
         self.grid()
 
 
