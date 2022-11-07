@@ -7,24 +7,40 @@ import json
 
 class DBM:
 
-    def __init__(self, dbfilename=None):
-        if dbfilename is None:
-            self.dbfilename = "default.db"
+    def __init__(self, dbfilename=None, load_from_json=True):
+        if load_from_json:
+            if dbfilename is None:
+                self.dbfilename = "default.db.json"
+            else:
+                self.dbfilename = dbfilename
+            dbfile = open(self.dbfilename, "a+")
+            dbfile.seek(0)
+
+            try:
+                self.database = Database.from_json(json.load(dbfile))
+            except:
+                logging.warning("Failed to successfully load database from file, creating fresh")
+                self.database = database.Database()
+            dbfile.close()
+
         else:
-            self.dbfilename = dbfilename
+            if dbfilename is None:
+                self.dbfilename = "default.db"
+            else:
+                self.dbfilename = dbfilename
 
-        dbfile = open(self.dbfilename, "ab+")
-        dbfile.seek(0)
+            dbfile = open(self.dbfilename, "ab+")
+            dbfile.seek(0)
 
-        try:
-            self.database = pickle.load(dbfile)
-        except:
-            logging.warning("Failed to successfully load database from file, creating fresh")
-            self.database = database.Database()
+            try:
+                self.database = pickle.load(dbfile)
+            except:
+                logging.warning("Failed to successfully load database from file, creating fresh")
+                self.database = database.Database()
+            dbfile.close()
 
         max_receipt_id = self.database.get_max_receipt_id()
         Receipt.ID_CTR = max_receipt_id + 1
-        dbfile.close()
 
         self.db_lock = Lock()
 
@@ -72,6 +88,10 @@ class DBM:
     def serialise_db_to_json(self):
         with self.db_lock:
             return self.database.to_json()
+
+    def db_from_json(self, json):
+        with self.db_lock:
+            self.database = Database.from_json(json)
 
 
 

@@ -1,5 +1,4 @@
 import logging
-
 class Database:
 
     def __init__(self):
@@ -73,4 +72,10 @@ class Database:
 
     def to_json(self):
         return {rid: self.receipts[rid].to_json() for rid in self.receipts}
+
+    def from_json(json):
+        ret = Database()
+        for rid in json:
+            self.receipts[int(rid)] = Receipt.from_json(json[rid])
+        return ret
 

@@ -65,6 +65,12 @@ class Receipt:
                     ],
                 }
 
+    def from_json(self, d):
+        ret = Receipt(d["payer"], d["date"], metadata=d["metadata"])
+        for item in  d["items"]:
+            ret.items.append(item.from_json(item))
+        return ret
+
 
 class ReceiptItem:
 
@@ -92,5 +98,9 @@ class ReceiptItem:
                 "sharers": self.sharers,
                 "incomplete": self.incomplete,
                 }
+
+    def from_json(json):
+        ret = Item(json["name"], json["price"], json["quantity"], json["sharers"], incomplete=json["incomplete"])
+        return ret
 
 
