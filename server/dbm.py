@@ -17,9 +17,10 @@ class DBM:
             dbfile.seek(0)
 
             try:
-                self.database = Database.from_json(json.load(dbfile))
-            except:
+                self.database = database.Database.from_json(json.load(dbfile))
+            except Exception as e:
                 logging.warning("Failed to successfully load database from file, creating fresh")
+                logging.error(str(e))
                 self.database = database.Database()
             dbfile.close()
 
@@ -34,8 +35,9 @@ class DBM:
 
             try:
                 self.database = pickle.load(dbfile)
-            except:
+            except Exception as e:
                 logging.warning("Failed to successfully load database from file, creating fresh")
+                logging.error(str(e))
                 self.database = database.Database()
             dbfile.close()
 
@@ -79,7 +81,7 @@ class DBM:
             f.write(self.serialise_db())
 
         with open(self.dbfilename + ".json", "w+") as f:
-            json.dump(self.serialise_db_to_json(), f)
+            json.dump(self.serialise_db_to_json(), f, indent=4)
 
     def serialise_db(self):
         with self.db_lock:
